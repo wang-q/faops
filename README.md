@@ -1,0 +1,4 @@
+faops
+=====
+
+Operate fasta files
