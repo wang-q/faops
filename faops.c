@@ -10,17 +10,21 @@
 #ifdef __MINGW32__
 #include <direct.h>
 #else
+
 #include <sys/stat.h>
 #include <sys/types.h>
+
 #endif
 
 // kseq support gzipped files
 #include "kseq.h"
+
 KSEQ_INIT(gzFile, gzread)
 
 // **str** will be the name of HASH throughout the whole file
 // key is string, value is int
 #include "khash.h"
+
 KHASH_MAP_INIT_STR(str, int)
 
 // this macro doesn't work on a decayed pointer,
@@ -137,7 +141,7 @@ void reverse_str(char *str, long length) {
 void complement_str(char *str, long length) {
     int i;
     for (i = 0; i < length; ++i) {
-        str[i] = nt_comp[(int)str[i]];
+        str[i] = nt_comp[(int) str[i]];
     }
 }
 
@@ -146,7 +150,7 @@ int count_n(char *str, long length) {
     int i, n_count = 0;
 
     for (i = 0; i < length; i++) {
-        int base_val = nt_val[(int)(str[i])];
+        int base_val = nt_val[(int) (str[i])];
         if (base_val == N_BASE_VAL) {
             n_count++;
         }
@@ -184,7 +188,7 @@ int fa_count(int argc, char *argv[]) {
 
     if (argc == optind) {
         fprintf(stderr,
-                "faops count - count base statistics in FA file(s).\n"
+            "faops count - count base statistics in FA file(s).\n"
                 "usage:\n"
                 "    faops count <in.fa> [more_files.fa]\n"
                 "\n");
@@ -203,7 +207,7 @@ int fa_count(int argc, char *argv[]) {
             unsigned long base_count[5] = {0};
 
             for (i = 0; i < seq->seq.l; i++) {
-                int base_val = nt_val[(int)(seq->seq.s[i])];
+                int base_val = nt_val[(int) (seq->seq.s[i])];
 
                 if (base_val >= 0 && base_val <= 4) {
                     length++;
@@ -212,9 +216,9 @@ int fa_count(int argc, char *argv[]) {
             }
 
             printf("%s\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu", seq->name.s, length,
-                   base_count[A_BASE_VAL], base_count[C_BASE_VAL],
-                   base_count[G_BASE_VAL], base_count[T_BASE_VAL],
-                   base_count[N_BASE_VAL]);
+                base_count[A_BASE_VAL], base_count[C_BASE_VAL],
+                base_count[G_BASE_VAL], base_count[T_BASE_VAL],
+                base_count[N_BASE_VAL]);
             printf("\n");
 
             total_length += length;
@@ -227,9 +231,9 @@ int fa_count(int argc, char *argv[]) {
     }
 
     printf("total\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu", total_length,
-           total_base_count[A_BASE_VAL], total_base_count[C_BASE_VAL],
-           total_base_count[G_BASE_VAL], total_base_count[T_BASE_VAL],
-           total_base_count[N_BASE_VAL]);
+        total_base_count[A_BASE_VAL], total_base_count[C_BASE_VAL],
+        total_base_count[G_BASE_VAL], total_base_count[T_BASE_VAL],
+        total_base_count[N_BASE_VAL]);
     printf("\n");
 
     return 0;
@@ -258,14 +262,14 @@ int fa_frag(int argc, char *argv[]) {
     if (optind + 4 > argc || !isdigit(argv[optind + 1][0]) ||
         !isdigit(argv[optind + 2][0])) {
         fprintf(stderr,
-                "faops frag - Extract a piece of DNA from a .fa file.\n"
+            "faops frag - Extract a piece of DNA from a .fa file.\n"
                 "usage:\n"
                 "    faops frag [options] <in.fa> <start> <end> <out.fa>\n"
                 "\n"
                 "options:\n"
                 "    -l INT     sequence line length [%d]\n"
                 "\n",
-                line);
+            line);
         return 1;
     }
 
@@ -286,13 +290,13 @@ int fa_frag(int argc, char *argv[]) {
     while ((l = kseq_read(seq)) >= 0) {
         if (!is_first) {
             fprintf(stderr, "More than one sequence in %s, just using first\n",
-                    file_in);
+                file_in);
             break;
         }
 
         if (end > seq->seq.l) {
-            fprintf(stderr, "%s only has %d bases, truncating\n", seq->name.s,
-                    seq->seq.l);
+            fprintf(stderr, "%s only has %zu bases, truncating\n", seq->name.s,
+                seq->seq.l);
             end = seq->seq.l;
             if (start >= end) {
                 fprintf(stderr, "Sorry, no sequence left after truncating\n");
@@ -352,7 +356,7 @@ int fa_rc(int argc, char *argv[]) {
 
     if (optind + 2 > argc) {
         fprintf(stderr,
-                "faops rc - Reverse complement a FA file.\n"
+            "faops rc - Reverse complement a FA file.\n"
                 "usage:\n"
                 "    faops rc [options] <in.fa> <out.fa>\n"
                 "\n"
@@ -362,7 +366,7 @@ int fa_rc(int argc, char *argv[]) {
                 "    -c         Just Complement, prepends C_\n"
                 "    -l INT     sequence line length [%d]\n"
                 "\n",
-                line);
+            line);
         return 1;
     }
 
@@ -430,7 +434,7 @@ int fa_some(int argc, char *argv[]) {
 
     if (optind + 3 > argc) {
         fprintf(stderr,
-                "faops some - Extract multiple fa sequences\n"
+            "faops some - Extract multiple fa sequences\n"
                 "usage:\n"
                 "    faops some [options] <in.fa> <list.file> <out.fa>\n"
                 "\n"
@@ -438,7 +442,7 @@ int fa_some(int argc, char *argv[]) {
                 "    -i         Invert, output sequences not in the list\n"
                 "    -l INT     sequence line length [%d]\n"
                 "\n",
-                line);
+            line);
         return 1;
     }
 
@@ -456,7 +460,7 @@ int fa_some(int argc, char *argv[]) {
     // from Heng Li's replay to http://www.biostars.org/p/10353/
     int buf_size = 4096;
     char buf[buf_size];   // buffers for names in list.file
-    khash_t(str) * hash;  // the hash
+    khash_t(str) *hash;  // the hash
     hash = kh_init(str);
     int ret;           // return value from hashing
     int flag_key = 0;  // check keys' exists
@@ -540,18 +544,18 @@ int fa_filter(int argc, char *argv[]) {
         fprintf(
             stderr,
             "faops filter - Filter fa records\n"
-            "usage:\n"
-            "    faops filter [options] <in.fa> <out.fa>\n"
-            "\n"
-            "options:\n"
-            "    -a INT     pass sequences at least this big ('a'-smallest)\n"
-            "    -z INT     pass sequences this size or smaller ('z'-biggest)\n"
-            "    -n INT     pass sequences with fewer than this number of N's\n"
-            "    -u         Unique, removes duplicate ids, keeping the first\n"
-            "    -l INT     sequence line length [%d]\n"
-            "\n"
-            "Not all faFilter options were implemented.\n"
-            "Names' wildcards are easily accomplished by \"faops some\".\n",
+                "usage:\n"
+                "    faops filter [options] <in.fa> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -a INT     pass sequences at least this big ('a'-smallest)\n"
+                "    -z INT     pass sequences this size or smaller ('z'-biggest)\n"
+                "    -n INT     pass sequences with fewer than this number of N's\n"
+                "    -u         Unique, removes duplicate ids, keeping the first\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "Not all faFilter options were implemented.\n"
+                "Names' wildcards are easily accomplished by \"faops some\".\n",
             line);
         return 1;
     }
@@ -568,7 +572,7 @@ int fa_filter(int argc, char *argv[]) {
     seq = kseq_init(fp);
 
     // varialbes for hashing
-    khash_t(str) * hash;  // the hash
+    khash_t(str) *hash;  // the hash
     hash = kh_init(str);
     int ret;  // return value from hashing
 
@@ -635,7 +639,7 @@ int fa_split_name(int argc, char *argv[]) {
 
     if (optind + 2 > argc) {
         fprintf(stderr,
-                "faops split-name - Split an fa file into several files\n"
+            "faops split-name - Split an fa file into several files\n"
                 "                   Using sequence names as file names\n"
                 "usage:\n"
                 "    faops split-name [options] <in.fa> <outdir>\n"
@@ -643,7 +647,7 @@ int fa_split_name(int argc, char *argv[]) {
                 "options:\n"
                 "    -l INT     sequence line length [%d]\n"
                 "\n",
-                line);
+            line);
         return 1;
     }
 
@@ -711,13 +715,13 @@ int fa_split_about(int argc, char *argv[]) {
         fprintf(
             stderr,
             "faops split-about - Split an fa file into several files\n"
-            "                    of about approx_size bytes each by record\n"
-            "usage:\n"
-            "    faops split-about [options] <in.fa> <approx_size> <outdir>\n"
-            "\n"
-            "options:\n"
-            "    -l INT     sequence line length [%d]\n"
-            "\n",
+                "                    of about approx_size bytes each by record\n"
+                "usage:\n"
+                "    faops split-about [options] <in.fa> <approx_size> <outdir>\n"
+                "\n"
+                "options:\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n",
             line);
         return 1;
     }
@@ -777,23 +781,23 @@ static int usage() {
     fprintf(
         stderr,
         "\n"
-        "Usage:     faops <command> [options] <arguments>\n"
-        "Version:   0.1\n"
-        "\n"
-        "Command:\n"
-        "    count          Count base statistics in FA file(s)\n"
-        "    frag           Extract subsequences from a FA file\n"
-        "    rc             Reverse complement a FA file\n"
-        "    some           Extract some fa records.\n"
-        "    filter         Filter fa records.\n"
-        "    split-name     Splitting by sequence names\n"
-        "    split-about    Splitting to chunks about specified size\n"
-        "\n"
-        "Options:\n"
-        "    There're no global options.\n"
-        "    Type \"faops subcommand\" for detailed options of each command.\n"
-        "    Options *MUST* be placed just after subcommand.\n"
-        "\n");
+            "Usage:     faops <command> [options] <arguments>\n"
+            "Version:   0.1\n"
+            "\n"
+            "Command:\n"
+            "    count          Count base statistics in FA file(s)\n"
+            "    frag           Extract subsequences from a FA file\n"
+            "    rc             Reverse complement a FA file\n"
+            "    some           Extract some fa records.\n"
+            "    filter         Filter fa records.\n"
+            "    split-name     Splitting by sequence names\n"
+            "    split-about    Splitting to chunks about specified size\n"
+            "\n"
+            "Options:\n"
+            "    There're no global options.\n"
+            "    Type \"faops subcommand\" for detailed options of each command.\n"
+            "    Options *MUST* be placed just after subcommand.\n"
+            "\n");
     return 1;
 }
 

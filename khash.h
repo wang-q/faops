@@ -407,7 +407,7 @@ static const double __ac_HASH_UPPER = 0.77;
     __KHASH_TYPE(name, khkey_t, khval_t) __KHASH_IMPL(                     \
         name, SCOPE, khkey_t, khval_t, kh_is_map, __hash_func, __hash_equal)
 
-#define KHASH_INIT(name, khkey_t, khval_t, kh_is_map, __hash_func,   \
+#define KHASH_INIT(name, khkey_t, khval_t, kh_is_map, __hash_func, \
                    __hash_equal)                                     \
     KHASH_INIT2(name, static kh_inline, khkey_t, khval_t, kh_is_map, \
                 __hash_func, __hash_equal)
@@ -434,15 +434,16 @@ static const double __ac_HASH_UPPER = 0.77;
   @abstract     64-bit integer comparison function
  */
 #define kh_int64_hash_equal(a, b) ((a) == (b))
+
 /*! @function
   @abstract     const char* hash function
   @param  s     Pointer to a null terminated string
   @return       The hash value
  */
 static kh_inline khint_t __ac_X31_hash_string(const char *s) {
-    khint_t h = (khint_t) * s;
+    khint_t h = (khint_t) *s;
     if (h)
-        for (++s; *s; ++s) h = (h << 5) - h + (khint_t) * s;
+        for (++s; *s; ++s) h = (h << 5) - h + (khint_t) *s;
     return h;
 }
 /*! @function
@@ -465,6 +466,7 @@ static kh_inline khint_t __ac_Wang_hash(khint_t key) {
     key ^= (key >> 16);
     return key;
 }
+
 #define kh_int_hash_func2(k) __ac_Wang_hash((khint_t)key)
 
 /* --- END OF HASH FUNCTIONS --- */

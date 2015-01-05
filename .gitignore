@@ -17,3 +17,5 @@ test
 *.log
 *.bak
 
+*.o
+a.out
