@@ -188,7 +188,8 @@ int fa_count(int argc, char *argv[]) {
 
     if (argc == optind) {
         fprintf(stderr,
-            "faops count - count base statistics in FA file(s).\n"
+            "\n"
+                "faops count - count base statistics in FA file(s).\n"
                 "usage:\n"
                 "    faops count <in.fa> [more_files.fa]\n"
                 "\n");
@@ -262,7 +263,8 @@ int fa_frag(int argc, char *argv[]) {
     if (optind + 4 > argc || !isdigit(argv[optind + 1][0]) ||
         !isdigit(argv[optind + 2][0])) {
         fprintf(stderr,
-            "faops frag - Extract a piece of DNA from a .fa file.\n"
+            "\n"
+                "faops frag - Extract a piece of DNA from a .fa file.\n"
                 "usage:\n"
                 "    faops frag [options] <in.fa> <start> <end> <out.fa>\n"
                 "\n"
@@ -356,7 +358,8 @@ int fa_rc(int argc, char *argv[]) {
 
     if (optind + 2 > argc) {
         fprintf(stderr,
-            "faops rc - Reverse complement a FA file.\n"
+            "\n"
+                "faops rc - Reverse complement a FA file.\n"
                 "usage:\n"
                 "    faops rc [options] <in.fa> <out.fa>\n"
                 "\n"
@@ -434,7 +437,8 @@ int fa_some(int argc, char *argv[]) {
 
     if (optind + 3 > argc) {
         fprintf(stderr,
-            "faops some - Extract multiple fa sequences\n"
+            "\n"
+                "faops some - Extract multiple fa sequences\n"
                 "usage:\n"
                 "    faops some [options] <in.fa> <list.file> <out.fa>\n"
                 "\n"
@@ -543,7 +547,8 @@ int fa_filter(int argc, char *argv[]) {
     if (optind + 2 > argc) {
         fprintf(
             stderr,
-            "faops filter - Filter fa records\n"
+            "\n"
+                "faops filter - Filter fa records\n"
                 "usage:\n"
                 "    faops filter [options] <in.fa> <out.fa>\n"
                 "\n"
@@ -571,7 +576,7 @@ int fa_filter(int argc, char *argv[]) {
     fp = gzopen(file_in, "r");
     seq = kseq_init(fp);
 
-    // varialbes for hashing
+    // variables for hashing
     khash_t(str) *hash;  // the hash
     hash = kh_init(str);
     int ret;  // return value from hashing
@@ -639,7 +644,8 @@ int fa_split_name(int argc, char *argv[]) {
 
     if (optind + 2 > argc) {
         fprintf(stderr,
-            "faops split-name - Split an fa file into several files\n"
+            "\n"
+                "faops split-name - Split an fa file into several files\n"
                 "                   Using sequence names as file names\n"
                 "usage:\n"
                 "    faops split-name [options] <in.fa> <outdir>\n"
@@ -714,7 +720,8 @@ int fa_split_about(int argc, char *argv[]) {
     if (optind + 3 > argc) {
         fprintf(
             stderr,
-            "faops split-about - Split an fa file into several files\n"
+            "\n"
+                "faops split-about - Split an fa file into several files\n"
                 "                    of about approx_size bytes each by record\n"
                 "usage:\n"
                 "    faops split-about [options] <in.fa> <approx_size> <outdir>\n"

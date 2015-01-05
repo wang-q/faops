@@ -1,6 +1,7 @@
 # unneeded directories
 reference
 test
+build
 
 # slickedit project files
 *.vpj
