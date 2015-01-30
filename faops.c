@@ -159,14 +159,42 @@ int count_n(char *str, long length) {
     return n_count;
 }
 
+// https://biowize.wordpress.com/2013/03/05/using-kseq-h-with-stdin/
+// stream_in
+FILE *source_in(char *file) {
+    FILE *stream;
+
+    if (strcmp(file, "stdin") == 0) {
+        stream = stdin;
+    }
+    else {
+        if ((stream = fopen(file, "r")) == NULL) {
+            fprintf(stderr, "Cannot open input file [%s]\n", file);
+            exit(1);
+        }
+    }
+
+    return stream;
+}
+
+// stream_out
+FILE *source_out(char *file) {
+    FILE *stream;
+
+    if (strcmp(file, "stdout") == 0) {
+        stream = stdout;
+    }
+    else {
+        if ((stream = fopen(file, "w")) == NULL) {
+            fprintf(stderr, "Cannot open output file [%s]\n", file);
+            exit(1);
+        }
+    }
+
+    return stream;
+}
+
 int fa_count(int argc, char *argv[]) {
-    int f, i, l;
-    unsigned long total_length = 0;
-    unsigned long total_base_count[5] = {0};
-
-    gzFile fp;
-    kseq_t *seq;
-
     if (argc == optind) {
         fprintf(stderr,
             "\n"
@@ -174,8 +202,15 @@ int fa_count(int argc, char *argv[]) {
                 "usage:\n"
                 "    faops count <in.fa> [more_files.fa]\n"
                 "\n");
-        return 1;
+        exit(1);
     }
+
+    int f, i, l;
+    unsigned long total_length = 0;
+    unsigned long total_base_count[5] = {0};
+
+    gzFile fp;
+    kseq_t *seq;
 
     printf("#seq\tlen\tA\tC\tG\tT\tN");
     printf("\n");
@@ -222,18 +257,9 @@ int fa_count(int argc, char *argv[]) {
 }
 
 int fa_frag(int argc, char *argv[]) {
-    int start, end;
-    char *file_in, *file_out;
     int option = 0, line = 80;
 
-    gzFile fp;
-    kseq_t *seq;
-    FILE *fp_out;
-    int l, i;
-    char seq_name[512];
-    int is_first = 1;
-
-    while ((option = getopt(argc, argv, "l:")) >= 0) {
+    while ((option = getopt(argc, argv, "l:")) != -1) {
         switch (option) {
             case 'l':
                 line = atoi(optarg);
@@ -251,23 +277,33 @@ int fa_frag(int argc, char *argv[]) {
                 "\n"
                 "options:\n"
                 "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
                 "\n",
             line);
-        return 1;
-    }
-
-    file_in = argv[optind];
-    start = atoi(argv[optind + 1]);
-    end = atoi(argv[optind + 2]);
-    file_out = argv[optind + 3];
-
-    if (start >= end) fprintf(stderr, "start [%d] >= end [%d]\n", start, end);
-    if ((fp_out = fopen(file_out, "w")) == NULL) {
-        fprintf(stderr, "Cannot open output file [%s]\n", file_out);
         exit(1);
     }
 
-    fp = gzopen(argv[optind], "r");
+    char *file_in = argv[optind];
+    int start = atoi(argv[optind + 1]);
+    int end = atoi(argv[optind + 2]);
+    char *file_out = argv[optind + 3];
+
+    if (start >= end) {
+        fprintf(stderr, "start [%d] >= end [%d]\n", start, end);
+        exit(1);
+    }
+
+    FILE *stream_in = source_in(file_in);
+    FILE *stream_out = source_out(file_out);
+    gzFile fp;
+    kseq_t *seq;
+    int l, i;
+    char seq_name[512];
+    int is_first = 1;
+
+    fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
     while ((l = kseq_read(seq)) >= 0) {
@@ -288,35 +324,30 @@ int fa_frag(int argc, char *argv[]) {
         }
 
         sprintf(seq_name, "%s:%d-%d", seq->name.s, start, end);
-        fprintf(fp_out, ">%s\n", seq_name);
+        fprintf(stream_out, ">%s\n", seq_name);
 
         for (i = 0; i < end - start + 1; i++) {
             if (line != 0 && i != 0 && (i % line) == 0) {
-                fputc('\n', fp_out);
+                fputc('\n', stream_out);
             }
-            fputc(seq->seq.s[i + start - 1], fp_out);
+            fputc(seq->seq.s[i + start - 1], stream_out);
         }
-        fputc('\n', fp_out);
+        fputc('\n', stream_out);
 
         is_first = 0;
     }
 
     kseq_destroy(seq);
     gzclose(fp);
-    fclose(fp_out);
+    if (strcmp(file_out, "stdout") != 0) {
+        fclose(stream_out);
+    }
     return 0;
 }
 
 int fa_rc(int argc, char *argv[]) {
-    char *file_in, *file_out;
     int flag_n = 0, flag_r = 0, flag_c = 0;
     int option = 0, line = 80;
-
-    gzFile fp;
-    kseq_t *seq;
-    FILE *fp_out;
-    int l, i;
-    char seq_name[512];
 
     while ((option = getopt(argc, argv, "nrcl:")) != -1) {
         switch (option) {
@@ -349,25 +380,30 @@ int fa_rc(int argc, char *argv[]) {
                 "    -r         Just Reverse, prepends R_\n"
                 "    -c         Just Complement, prepends C_\n"
                 "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
                 "\n",
             line);
-        return 1;
-    }
-
-    file_in = argv[optind];
-    file_out = argv[optind + 1];
-
-    if ((fp_out = fopen(file_out, "w")) == NULL) {
-        fprintf(stderr, "Cannot open output file [%s]\n", file_out);
         exit(1);
     }
 
-    fp = gzopen(file_in, "r");
+    char *file_in = argv[optind];
+    char *file_out = argv[optind + 1];
+
+    FILE *stream_in = source_in(file_in);
+    FILE *stream_out = source_out(file_out);
+    gzFile fp;
+    kseq_t *seq;
+    int l, i;
+    char seq_name[512];
+
+    fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
     while ((l = kseq_read(seq)) >= 0) {
         sprintf(seq_name, "%s%s", prefix, seq->name.s);
-        fprintf(fp_out, ">%s\n", seq_name);
+        fprintf(stream_out, ">%s\n", seq_name);
 
         if (flag_r) {
             reverse_str(seq->seq.s, seq->seq.l);
@@ -380,30 +416,24 @@ int fa_rc(int argc, char *argv[]) {
 
         for (i = 0; i < seq->seq.l; i++) {
             if (line != 0 && i != 0 && (i % line) == 0) {
-                fputc('\n', fp_out);
+                fputc('\n', stream_out);
             }
-            fputc(seq->seq.s[i], fp_out);
+            fputc(seq->seq.s[i], stream_out);
         }
-        fputc('\n', fp_out);
+        fputc('\n', stream_out);
     }
 
     kseq_destroy(seq);
     gzclose(fp);
-    fclose(fp_out);
+    if (strcmp(file_out, "stdout") != 0) {
+        fclose(stream_out);
+    }
     return 0;
 }
 
 int fa_some(int argc, char *argv[]) {
-    char *file_in, *file_list, *file_out;
     int flag_i = 0;
     int option = 0, line = 80;
-
-    gzFile fp;
-    kseq_t *seq;
-    FILE *fp_list;
-    FILE *fp_out;
-    int l, i;
-    char seq_name[512];
 
     while ((option = getopt(argc, argv, "il:")) != -1) {
         switch (option) {
@@ -426,14 +456,28 @@ int fa_some(int argc, char *argv[]) {
                 "options:\n"
                 "    -i         Invert, output sequences not in the list\n"
                 "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
                 "\n",
             line);
-        return 1;
+        exit(1);
     }
 
-    file_in = argv[optind];
-    file_list = argv[optind + 1];
-    file_out = argv[optind + 2];
+    char *file_in = argv[optind];
+    char *file_list = argv[optind + 1];
+    char *file_out = argv[optind + 2];
+
+    FILE *stream_in = source_in(file_in);
+    FILE *stream_out = source_out(file_out);
+    gzFile fp;
+    kseq_t *seq;
+    FILE *fp_list;
+    int l, i;
+    char seq_name[512];
+
+    fp = gzdopen(fileno(stream_in), "r");
+    seq = kseq_init(fp);
 
     //  Read list.file to a hash table
     if ((fp_list = fopen(file_list, "r")) == NULL) {
@@ -455,14 +499,6 @@ int fa_some(int argc, char *argv[]) {
     }
     fclose(fp_list);
 
-    if ((fp_out = fopen(file_out, "w")) == NULL) {
-        fprintf(stderr, "Cannot open output file [%s]\n", file_out);
-        exit(1);
-    }
-
-    fp = gzopen(file_in, "r");
-    seq = kseq_init(fp);
-
     while ((l = kseq_read(seq)) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
 
@@ -474,36 +510,30 @@ int fa_some(int argc, char *argv[]) {
         // key  0      0            1
         // xor
         if ((!flag_key) != (!flag_i)) {
-            fprintf(fp_out, ">%s\n", seq_name);
+            fprintf(stream_out, ">%s\n", seq_name);
             for (i = 0; i < seq->seq.l; i++) {
                 if (line != 0 && i != 0 && (i % line) == 0) {
-                    fputc('\n', fp_out);
+                    fputc('\n', stream_out);
                 }
-                fputc(seq->seq.s[i], fp_out);
+                fputc(seq->seq.s[i], stream_out);
             }
-            fputc('\n', fp_out);
+            fputc('\n', stream_out);
         }
     }
 
     kh_destroy(str, hash);  // FIXME: free keys before destroy
     kseq_destroy(seq);
     gzclose(fp);
-    fclose(fp_out);
+    if (strcmp(file_out, "stdout") != 0) {
+        fclose(stream_out);
+    }
     return 0;
 }
 
 int fa_filter(int argc, char *argv[]) {
-    char *file_in, *file_out;
     int flag_u = 0;
     int min_size = -1, max_size = -1, max_n = -1;
     int option = 0, line = 80;
-
-    gzFile fp;
-    kseq_t *seq;
-    FILE *fp_out;
-    int l, i;
-    char seq_name[512];
-    int flag_pass;
 
     while ((option = getopt(argc, argv, "ua:z:n:l:")) != -1) {
         switch (option) {
@@ -540,21 +570,28 @@ int fa_filter(int argc, char *argv[]) {
                 "    -u         Unique, removes duplicate ids, keeping the first\n"
                 "    -l INT     sequence line length [%d]\n"
                 "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n"
                 "Not all faFilter options were implemented.\n"
-                "Names' wildcards are easily accomplished by \"faops some\".\n",
+                "Names' wildcards are easily accomplished by \"faops some\".\n"
+                "\n",
             line);
-        return 1;
-    }
-
-    file_in = argv[optind];
-    file_out = argv[optind + 1];
-
-    if ((fp_out = fopen(file_out, "w")) == NULL) {
-        fprintf(stderr, "Cannot open output file [%s]\n", file_out);
         exit(1);
     }
 
-    fp = gzopen(file_in, "r");
+    char *file_in = argv[optind];
+    char *file_out = argv[optind + 1];
+
+    FILE *stream_in = source_in(file_in);
+    FILE *stream_out = source_out(file_out);
+    gzFile fp;
+    kseq_t *seq;
+    int l, i;
+    char seq_name[512];
+    int flag_pass;
+
+    fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
     // variables for hashing
@@ -587,33 +624,27 @@ int fa_filter(int argc, char *argv[]) {
         }
 
         if (flag_pass) {
-            fprintf(fp_out, ">%s\n", seq_name);
+            fprintf(stream_out, ">%s\n", seq_name);
             for (i = 0; i < seq->seq.l; i++) {
                 if (line != 0 && i != 0 && (i % line) == 0) {
-                    fputc('\n', fp_out);
+                    fputc('\n', stream_out);
                 }
-                fputc(seq->seq.s[i], fp_out);
+                fputc(seq->seq.s[i], stream_out);
             }
-            fputc('\n', fp_out);
+            fputc('\n', stream_out);
         }
     }
 
     kseq_destroy(seq);
     gzclose(fp);
-    fclose(fp_out);
+    if (strcmp(file_out, "stdout") != 0) {
+        fclose(stream_out);
+    }
     return 0;
 }
 
 int fa_split_name(int argc, char *argv[]) {
-    char *file_in, *path_out;
     int option = 0, line = 80;
-
-    gzFile fp;
-    kseq_t *seq;
-    FILE *fp_out;
-    int l, i;
-    char seq_name[512];
-    char file_out[1024];
 
     while ((option = getopt(argc, argv, "l:")) != -1) {
         switch (option) {
@@ -633,13 +664,23 @@ int fa_split_name(int argc, char *argv[]) {
                 "\n"
                 "options:\n"
                 "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
                 "\n",
             line);
-        return 1;
+        exit(1);
     }
 
-    file_in = argv[optind];
-    path_out = argv[optind + 1];
+    char *file_in = argv[optind];
+    char *path_out = argv[optind + 1];
+
+    FILE *stream_in = source_in(file_in);
+    gzFile fp;
+    kseq_t *seq;
+    FILE *fp_out;
+    int l, i;
+    char seq_name[512];
+    char file_out[1024];
 
 #ifdef __MINGW32__
     _mkdir(path_out);
@@ -647,7 +688,7 @@ int fa_split_name(int argc, char *argv[]) {
     mkdir(path_out, 0777);
 #endif
 
-    fp = gzopen(file_in, "r");
+    fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
     while ((l = kseq_read(seq)) >= 0) {
@@ -678,17 +719,7 @@ int fa_split_name(int argc, char *argv[]) {
 }
 
 int fa_split_about(int argc, char *argv[]) {
-    char *file_in, *path_out;
-    int approx_size;
     int option = 0, line = 80;
-
-    gzFile fp;
-    kseq_t *seq;
-    FILE *fp_out;
-    int l, i;
-    char seq_name[512];
-    char file_out[1024];
-    int cur_size = 0, file_count = 0, flag_first = 1;
 
     while ((option = getopt(argc, argv, "l:")) != -1) {
         switch (option) {
@@ -711,12 +742,21 @@ int fa_split_about(int argc, char *argv[]) {
                 "    -l INT     sequence line length [%d]\n"
                 "\n",
             line);
-        return 1;
+        exit(1);
     }
 
-    file_in = argv[optind];
-    approx_size = atoi(argv[optind + 1]);
-    path_out = argv[optind + 2];
+    char *file_in = argv[optind];
+    int approx_size = atoi(argv[optind + 1]);
+    char *path_out = argv[optind + 2];
+
+    FILE *stream_in = source_in(file_in);
+    gzFile fp;
+    kseq_t *seq;
+    FILE *fp_out;
+    int l, i;
+    char seq_name[512];
+    char file_out[1024];
+    int cur_size = 0, file_count = 0, flag_first = 1;
 
 #ifdef __MINGW32__
     _mkdir(path_out);
@@ -724,7 +764,7 @@ int fa_split_about(int argc, char *argv[]) {
     mkdir(path_out, 0777);
 #endif
 
-    fp = gzopen(file_in, "r");
+    fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
     while ((l = kseq_read(seq)) >= 0) {
@@ -770,7 +810,7 @@ static int usage() {
         stderr,
         "\n"
             "Usage:     faops <command> [options] <arguments>\n"
-            "Version:   0.1\n"
+            "Version:   0.2\n"
             "\n"
             "Command:\n"
             "    count          Count base statistics in FA file(s)\n"
