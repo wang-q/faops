@@ -197,11 +197,11 @@ FILE *source_out(char *file) {
 int fa_count(int argc, char *argv[]) {
     if (argc == optind) {
         fprintf(stderr,
-            "\n"
-                "faops count - count base statistics in FA file(s).\n"
-                "usage:\n"
-                "    faops count <in.fa> [more_files.fa]\n"
-                "\n");
+                "\n"
+                    "faops count - count base statistics in FA file(s).\n"
+                    "usage:\n"
+                    "    faops count <in.fa> [more_files.fa]\n"
+                    "\n");
         exit(1);
     }
 
@@ -233,9 +233,9 @@ int fa_count(int argc, char *argv[]) {
             }
 
             printf("%s\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu", seq->name.s, length,
-                base_count[A_BASE_VAL], base_count[C_BASE_VAL],
-                base_count[G_BASE_VAL], base_count[T_BASE_VAL],
-                base_count[N_BASE_VAL]);
+                   base_count[A_BASE_VAL], base_count[C_BASE_VAL],
+                   base_count[G_BASE_VAL], base_count[T_BASE_VAL],
+                   base_count[N_BASE_VAL]);
             printf("\n");
 
             total_length += length;
@@ -248,10 +248,42 @@ int fa_count(int argc, char *argv[]) {
     }
 
     printf("total\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu", total_length,
-        total_base_count[A_BASE_VAL], total_base_count[C_BASE_VAL],
-        total_base_count[G_BASE_VAL], total_base_count[T_BASE_VAL],
-        total_base_count[N_BASE_VAL]);
+           total_base_count[A_BASE_VAL], total_base_count[C_BASE_VAL],
+           total_base_count[G_BASE_VAL], total_base_count[T_BASE_VAL],
+           total_base_count[N_BASE_VAL]);
     printf("\n");
+
+    return 0;
+}
+
+int fa_size(int argc, char *argv[]) {
+    if (argc == optind) {
+        fprintf(stderr,
+                "\n"
+                    "faops size - count total bases in FA file(s).\n"
+                    "usage:\n"
+                    "    faops size <in.fa> [more_files.fa]\n"
+                    "\n");
+        exit(1);
+    }
+
+    int f, l;
+
+    gzFile fp;
+    kseq_t *seq;
+
+    for (f = 0; f < argc; ++f) {
+        fp = gzopen(argv[f], "r");
+        seq = kseq_init(fp);
+
+        while ((l = kseq_read(seq)) >= 0) {
+            printf("%s\t%lu", seq->name.s, seq->seq.l);
+            printf("\n");
+        }
+
+        kseq_destroy(seq);
+        gzclose(fp);
+    }
 
     return 0;
 }
@@ -270,18 +302,18 @@ int fa_frag(int argc, char *argv[]) {
     if (optind + 4 > argc || !isdigit(argv[optind + 1][0]) ||
         !isdigit(argv[optind + 2][0])) {
         fprintf(stderr,
-            "\n"
-                "faops frag - Extract a piece of DNA from a .fa file.\n"
-                "usage:\n"
-                "    faops frag [options] <in.fa> <start> <end> <out.fa>\n"
                 "\n"
-                "options:\n"
-                "    -l INT     sequence line length [%d]\n"
-                "\n"
-                "in.fa  == stdin  means reading from stdin\n"
-                "out.fa == stdout means writing to stdout\n"
-                "\n",
-            line);
+                    "faops frag - Extract a piece of DNA from a .fa file.\n"
+                    "usage:\n"
+                    "    faops frag [options] <in.fa> <start> <end> <out.fa>\n"
+                    "\n"
+                    "options:\n"
+                    "    -l INT     sequence line length [%d]\n"
+                    "\n"
+                    "in.fa  == stdin  means reading from stdin\n"
+                    "out.fa == stdout means writing to stdout\n"
+                    "\n",
+                line);
         exit(1);
     }
 
@@ -309,13 +341,13 @@ int fa_frag(int argc, char *argv[]) {
     while ((l = kseq_read(seq)) >= 0) {
         if (!is_first) {
             fprintf(stderr, "More than one sequence in %s, just using first\n",
-                file_in);
+                    file_in);
             break;
         }
 
         if (end > seq->seq.l) {
             fprintf(stderr, "%s only has %zu bases, truncating\n", seq->name.s,
-                seq->seq.l);
+                    seq->seq.l);
             end = seq->seq.l;
             if (start >= end) {
                 fprintf(stderr, "Sorry, no sequence left after truncating\n");
@@ -370,21 +402,21 @@ int fa_rc(int argc, char *argv[]) {
 
     if (optind + 2 > argc) {
         fprintf(stderr,
-            "\n"
-                "faops rc - Reverse complement a FA file.\n"
-                "usage:\n"
-                "    faops rc [options] <in.fa> <out.fa>\n"
                 "\n"
-                "options:\n"
-                "    -n         keep name identical (don't prepend RC_)\n"
-                "    -r         Just Reverse, prepends R_\n"
-                "    -c         Just Complement, prepends C_\n"
-                "    -l INT     sequence line length [%d]\n"
-                "\n"
-                "in.fa  == stdin  means reading from stdin\n"
-                "out.fa == stdout means writing to stdout\n"
-                "\n",
-            line);
+                    "faops rc - Reverse complement a FA file.\n"
+                    "usage:\n"
+                    "    faops rc [options] <in.fa> <out.fa>\n"
+                    "\n"
+                    "options:\n"
+                    "    -n         keep name identical (don't prepend RC_)\n"
+                    "    -r         Just Reverse, prepends R_\n"
+                    "    -c         Just Complement, prepends C_\n"
+                    "    -l INT     sequence line length [%d]\n"
+                    "\n"
+                    "in.fa  == stdin  means reading from stdin\n"
+                    "out.fa == stdout means writing to stdout\n"
+                    "\n",
+                line);
         exit(1);
     }
 
@@ -448,19 +480,19 @@ int fa_some(int argc, char *argv[]) {
 
     if (optind + 3 > argc) {
         fprintf(stderr,
-            "\n"
-                "faops some - Extract multiple fa sequences\n"
-                "usage:\n"
-                "    faops some [options] <in.fa> <list.file> <out.fa>\n"
                 "\n"
-                "options:\n"
-                "    -i         Invert, output sequences not in the list\n"
-                "    -l INT     sequence line length [%d]\n"
-                "\n"
-                "in.fa  == stdin  means reading from stdin\n"
-                "out.fa == stdout means writing to stdout\n"
-                "\n",
-            line);
+                    "faops some - Extract multiple fa sequences\n"
+                    "usage:\n"
+                    "    faops some [options] <in.fa> <list.file> <out.fa>\n"
+                    "\n"
+                    "options:\n"
+                    "    -i         Invert, output sequences not in the list\n"
+                    "    -l INT     sequence line length [%d]\n"
+                    "\n"
+                    "in.fa  == stdin  means reading from stdin\n"
+                    "out.fa == stdout means writing to stdout\n"
+                    "\n",
+                line);
         exit(1);
     }
 
@@ -656,18 +688,18 @@ int fa_split_name(int argc, char *argv[]) {
 
     if (optind + 2 > argc) {
         fprintf(stderr,
-            "\n"
-                "faops split-name - Split an fa file into several files\n"
-                "                   Using sequence names as file names\n"
-                "usage:\n"
-                "    faops split-name [options] <in.fa> <outdir>\n"
                 "\n"
-                "options:\n"
-                "    -l INT     sequence line length [%d]\n"
-                "\n"
-                "in.fa  == stdin  means reading from stdin\n"
-                "\n",
-            line);
+                    "faops split-name - Split an fa file into several files\n"
+                    "                   Using sequence names as file names\n"
+                    "usage:\n"
+                    "    faops split-name [options] <in.fa> <outdir>\n"
+                    "\n"
+                    "options:\n"
+                    "    -l INT     sequence line length [%d]\n"
+                    "\n"
+                    "in.fa  == stdin  means reading from stdin\n"
+                    "\n",
+                line);
         exit(1);
     }
 
@@ -810,10 +842,11 @@ static int usage() {
         stderr,
         "\n"
             "Usage:     faops <command> [options] <arguments>\n"
-            "Version:   0.2\n"
+            "Version:   0.2.1\n"
             "\n"
-            "Command:\n"
+            "Commands:\n"
             "    count          Count base statistics in FA file(s)\n"
+            "    size           Count total bases in FA file(s)\n"
             "    frag           Extract subsequences from a FA file\n"
             "    rc             Reverse complement a FA file\n"
             "    some           Extract some fa records.\n"
@@ -823,7 +856,7 @@ static int usage() {
             "\n"
             "Options:\n"
             "    There're no global options.\n"
-            "    Type \"faops subcommand\" for detailed options of each command.\n"
+            "    Type \"faops command-name\" for detailed options of each command.\n"
             "    Options *MUST* be placed just after subcommand.\n"
             "\n");
     return 1;
@@ -837,6 +870,8 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(argv[1], "count") == 0)
         fa_count(argc - 1, argv + 1);
+    else if (strcmp(argv[1], "size") == 0)
+        fa_size(argc - 1, argv + 1);
     else if (strcmp(argv[1], "frag") == 0)
         fa_frag(argc - 1, argv + 1);
     else if (strcmp(argv[1], "rc") == 0)
