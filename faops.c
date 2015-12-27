@@ -517,7 +517,7 @@ int fa_some(int argc, char *argv[]) {
         exit(1);
     }
 
-    // varialbes for hashing
+    // variables for hashing
     // from Heng Li's replay to http://www.biostars.org/p/10353/
     int buf_size = 4096;
     char buf[buf_size];   // buffers for names in list.file
