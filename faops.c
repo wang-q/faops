@@ -837,29 +837,37 @@ int fa_split_about(int argc, char *argv[]) {
     return 0;
 }
 
+char *version = "0.2.2";
+char *message =
+        "\n"
+                "Usage:     faops <command> [options] <arguments>\n"
+                "Version:   %s\n"
+                "\n"
+                "Commands:\n"
+                "    help           print this message\n"
+                "    count          Count base statistics in FA file(s)\n"
+                "    size           Count total bases in FA file(s)\n"
+                "    frag           Extract subsequences from a FA file\n"
+                "    rc             Reverse complement a FA file\n"
+                "    some           Extract some fa records.\n"
+                "    filter         Filter fa records.\n"
+                "    split-name     Splitting by sequence names\n"
+                "    split-about    Splitting to chunks about specified size\n"
+                "\n"
+                "Options:\n"
+                "    There're no global options.\n"
+                "    Type \"faops command-name\" for detailed options of each command.\n"
+                "    Options *MUST* be placed just after subcommand.\n"
+                "\n";
+
 static int usage() {
-    fprintf(
-            stderr,
-            "\n"
-                    "Usage:     faops <command> [options] <arguments>\n"
-                    "Version:   0.2.2\n"
-                    "\n"
-                    "Commands:\n"
-                    "    count          Count base statistics in FA file(s)\n"
-                    "    size           Count total bases in FA file(s)\n"
-                    "    frag           Extract subsequences from a FA file\n"
-                    "    rc             Reverse complement a FA file\n"
-                    "    some           Extract some fa records.\n"
-                    "    filter         Filter fa records.\n"
-                    "    split-name     Splitting by sequence names\n"
-                    "    split-about    Splitting to chunks about specified size\n"
-                    "\n"
-                    "Options:\n"
-                    "    There're no global options.\n"
-                    "    Type \"faops command-name\" for detailed options of each command.\n"
-                    "    Options *MUST* be placed just after subcommand.\n"
-                    "\n");
+    fprintf(stderr, message, version);
     return 1;
+}
+
+static int help() {
+    fprintf(stdout, message, version);
+    return 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -884,6 +892,8 @@ int main(int argc, char *argv[]) {
         fa_split_name(argc - 1, argv + 1);
     else if (strcmp(argv[1], "split-about") == 0)
         fa_split_about(argc - 1, argv + 1);
+    else if (strcmp(argv[1], "help") == 0)
+        return help();
     else {
         fprintf(stderr, "[main] unrecognized commad '%s'. Abort!\n", argv[1]);
         return 1;
