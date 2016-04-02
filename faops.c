@@ -3,6 +3,9 @@
 #include <string.h>
 #include <zlib.h>
 
+// uint_fast8_t etc
+//#include <stdint.h>
+
 // getopt is defined in "unistd.h"
 #include <unistd.h>
 
@@ -62,8 +65,7 @@ int nt_comp[256];
 //  N   =>  A or G or C or T (any)
 
 void init_nt_val() {
-    int i;
-    for (i = 0; i < ArraySize(nt_val); i++) {
+    for (int i = 0; i < ArraySize(nt_val); i++) {
         nt_val[i] = -1;
     }
 
@@ -139,17 +141,16 @@ void reverse_str(char *str, long length) {
 }
 
 void complement_str(char *str, long length) {
-    int i;
-    for (i = 0; i < length; ++i) {
+    for (long i = 0; i < length; ++i) {
         str[i] = nt_comp[(int) str[i]];
     }
 }
 
 // Count Ns in sequence
 int count_n(char *str, long length) {
-    int i, n_count = 0;
+    int n_count = 0;
 
-    for (i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
         int base_val = nt_val[(int) (str[i])];
         if (base_val == N_BASE_VAL) {
             n_count++;
@@ -198,14 +199,13 @@ int fa_count(int argc, char *argv[]) {
     if (argc == optind) {
         fprintf(stderr,
                 "\n"
-                    "faops count - count base statistics in FA file(s).\n"
-                    "usage:\n"
-                    "    faops count <in.fa> [more_files.fa]\n"
-                    "\n");
+                        "faops count - count base statistics in FA file(s).\n"
+                        "usage:\n"
+                        "    faops count <in.fa> [more_files.fa]\n"
+                        "\n");
         exit(1);
     }
 
-    int f, i, l;
     unsigned long total_length = 0;
     unsigned long total_base_count[5] = {0};
 
@@ -215,15 +215,16 @@ int fa_count(int argc, char *argv[]) {
     printf("#seq\tlen\tA\tC\tG\tT\tN");
     printf("\n");
 
-    for (f = 0; f < argc; ++f) {
+    for (int f = 0; f < argc; ++f) {
         fp = gzopen(argv[f], "r");
         seq = kseq_init(fp);
 
+        int l;
         while ((l = kseq_read(seq)) >= 0) {
             unsigned long length = 0;
             unsigned long base_count[5] = {0};
 
-            for (i = 0; i < seq->seq.l; i++) {
+            for (int i = 0; i < seq->seq.l; i++) {
                 int base_val = nt_val[(int) (seq->seq.s[i])];
 
                 if (base_val >= 0 && base_val <= 4) {
@@ -239,7 +240,7 @@ int fa_count(int argc, char *argv[]) {
             printf("\n");
 
             total_length += length;
-            for (i = 0; i < ArraySize(base_count); i++)
+            for (int i = 0; i < ArraySize(base_count); i++)
                 total_base_count[i] += base_count[i];
         }
 
@@ -260,22 +261,21 @@ int fa_size(int argc, char *argv[]) {
     if (argc == optind) {
         fprintf(stderr,
                 "\n"
-                    "faops size - count total bases in FA file(s).\n"
-                    "usage:\n"
-                    "    faops size <in.fa> [more_files.fa]\n"
-                    "\n");
+                        "faops size - count total bases in FA file(s).\n"
+                        "usage:\n"
+                        "    faops size <in.fa> [more_files.fa]\n"
+                        "\n");
         exit(1);
     }
-
-    int f, l;
 
     gzFile fp;
     kseq_t *seq;
 
-    for (f = 0; f < argc; ++f) {
+    for (int f = 0; f < argc; ++f) {
         fp = gzopen(argv[f], "r");
         seq = kseq_init(fp);
 
+        int l;
         while ((l = kseq_read(seq)) >= 0) {
             printf("%s\t%lu", seq->name.s, seq->seq.l);
             printf("\n");
@@ -303,16 +303,16 @@ int fa_frag(int argc, char *argv[]) {
         !isdigit(argv[optind + 2][0])) {
         fprintf(stderr,
                 "\n"
-                    "faops frag - Extract a piece of DNA from a .fa file.\n"
-                    "usage:\n"
-                    "    faops frag [options] <in.fa> <start> <end> <out.fa>\n"
-                    "\n"
-                    "options:\n"
-                    "    -l INT     sequence line length [%d]\n"
-                    "\n"
-                    "in.fa  == stdin  means reading from stdin\n"
-                    "out.fa == stdout means writing to stdout\n"
-                    "\n",
+                        "faops frag - Extract a piece of DNA from a .fa file.\n"
+                        "usage:\n"
+                        "    faops frag [options] <in.fa> <start> <end> <out.fa>\n"
+                        "\n"
+                        "options:\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "out.fa == stdout means writing to stdout\n"
+                        "\n",
                 line);
         exit(1);
     }
@@ -331,13 +331,13 @@ int fa_frag(int argc, char *argv[]) {
     FILE *stream_out = source_out(file_out);
     gzFile fp;
     kseq_t *seq;
-    int l, i;
     char seq_name[512];
     int is_first = 1;
 
     fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
+    int l;
     while ((l = kseq_read(seq)) >= 0) {
         if (!is_first) {
             fprintf(stderr, "More than one sequence in %s, just using first\n",
@@ -358,7 +358,7 @@ int fa_frag(int argc, char *argv[]) {
         sprintf(seq_name, "%s:%d-%d", seq->name.s, start, end);
         fprintf(stream_out, ">%s\n", seq_name);
 
-        for (i = 0; i < end - start + 1; i++) {
+        for (int i = 0; i < end - start + 1; i++) {
             if (line != 0 && i != 0 && (i % line) == 0) {
                 fputc('\n', stream_out);
             }
@@ -403,19 +403,19 @@ int fa_rc(int argc, char *argv[]) {
     if (optind + 2 > argc) {
         fprintf(stderr,
                 "\n"
-                    "faops rc - Reverse complement a FA file.\n"
-                    "usage:\n"
-                    "    faops rc [options] <in.fa> <out.fa>\n"
-                    "\n"
-                    "options:\n"
-                    "    -n         keep name identical (don't prepend RC_)\n"
-                    "    -r         Just Reverse, prepends R_\n"
-                    "    -c         Just Complement, prepends C_\n"
-                    "    -l INT     sequence line length [%d]\n"
-                    "\n"
-                    "in.fa  == stdin  means reading from stdin\n"
-                    "out.fa == stdout means writing to stdout\n"
-                    "\n",
+                        "faops rc - Reverse complement a FA file.\n"
+                        "usage:\n"
+                        "    faops rc [options] <in.fa> <out.fa>\n"
+                        "\n"
+                        "options:\n"
+                        "    -n         keep name identical (don't prepend RC_)\n"
+                        "    -r         Just Reverse, prepends R_\n"
+                        "    -c         Just Complement, prepends C_\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "out.fa == stdout means writing to stdout\n"
+                        "\n",
                 line);
         exit(1);
     }
@@ -427,12 +427,12 @@ int fa_rc(int argc, char *argv[]) {
     FILE *stream_out = source_out(file_out);
     gzFile fp;
     kseq_t *seq;
-    int l, i;
     char seq_name[512];
 
     fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
+    int l;
     while ((l = kseq_read(seq)) >= 0) {
         sprintf(seq_name, "%s%s", prefix, seq->name.s);
         fprintf(stream_out, ">%s\n", seq_name);
@@ -446,7 +446,7 @@ int fa_rc(int argc, char *argv[]) {
             complement_str(seq->seq.s, seq->seq.l);
         }
 
-        for (i = 0; i < seq->seq.l; i++) {
+        for (int i = 0; i < seq->seq.l; i++) {
             if (line != 0 && i != 0 && (i % line) == 0) {
                 fputc('\n', stream_out);
             }
@@ -481,17 +481,17 @@ int fa_some(int argc, char *argv[]) {
     if (optind + 3 > argc) {
         fprintf(stderr,
                 "\n"
-                    "faops some - Extract multiple fa sequences\n"
-                    "usage:\n"
-                    "    faops some [options] <in.fa> <list.file> <out.fa>\n"
-                    "\n"
-                    "options:\n"
-                    "    -i         Invert, output sequences not in the list\n"
-                    "    -l INT     sequence line length [%d]\n"
-                    "\n"
-                    "in.fa  == stdin  means reading from stdin\n"
-                    "out.fa == stdout means writing to stdout\n"
-                    "\n",
+                        "faops some - Extract multiple fa sequences\n"
+                        "usage:\n"
+                        "    faops some [options] <in.fa> <list.file> <out.fa>\n"
+                        "\n"
+                        "options:\n"
+                        "    -i         Invert, output sequences not in the list\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "out.fa == stdout means writing to stdout\n"
+                        "\n",
                 line);
         exit(1);
     }
@@ -505,7 +505,6 @@ int fa_some(int argc, char *argv[]) {
     gzFile fp;
     kseq_t *seq;
     FILE *fp_list;
-    int l, i;
     char seq_name[512];
 
     fp = gzdopen(fileno(stream_in), "r");
@@ -531,6 +530,7 @@ int fa_some(int argc, char *argv[]) {
     }
     fclose(fp_list);
 
+    int l;
     while ((l = kseq_read(seq)) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
 
@@ -543,7 +543,7 @@ int fa_some(int argc, char *argv[]) {
         // xor
         if ((!flag_key) != (!flag_i)) {
             fprintf(stream_out, ">%s\n", seq_name);
-            for (i = 0; i < seq->seq.l; i++) {
+            for (int i = 0; i < seq->seq.l; i++) {
                 if (line != 0 && i != 0 && (i % line) == 0) {
                     fputc('\n', stream_out);
                 }
@@ -589,26 +589,26 @@ int fa_filter(int argc, char *argv[]) {
 
     if (optind + 2 > argc) {
         fprintf(
-            stderr,
-            "\n"
-                "faops filter - Filter fa records\n"
-                "usage:\n"
-                "    faops filter [options] <in.fa> <out.fa>\n"
+                stderr,
                 "\n"
-                "options:\n"
-                "    -a INT     pass sequences at least this big ('a'-smallest)\n"
-                "    -z INT     pass sequences this size or smaller ('z'-biggest)\n"
-                "    -n INT     pass sequences with fewer than this number of N's\n"
-                "    -u         Unique, removes duplicate ids, keeping the first\n"
-                "    -l INT     sequence line length [%d]\n"
-                "\n"
-                "in.fa  == stdin  means reading from stdin\n"
-                "out.fa == stdout means writing to stdout\n"
-                "\n"
-                "Not all faFilter options were implemented.\n"
-                "Names' wildcards are easily accomplished by \"faops some\".\n"
-                "\n",
-            line);
+                        "faops filter - Filter fa records\n"
+                        "usage:\n"
+                        "    faops filter [options] <in.fa> <out.fa>\n"
+                        "\n"
+                        "options:\n"
+                        "    -a INT     pass sequences at least this big ('a'-smallest)\n"
+                        "    -z INT     pass sequences this size or smaller ('z'-biggest)\n"
+                        "    -n INT     pass sequences with fewer than this number of N's\n"
+                        "    -u         Unique, removes duplicate ids, keeping the first\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "out.fa == stdout means writing to stdout\n"
+                        "\n"
+                        "Not all faFilter options were implemented.\n"
+                        "Names' wildcards are easily accomplished by \"faops some\".\n"
+                        "\n",
+                line);
         exit(1);
     }
 
@@ -619,7 +619,6 @@ int fa_filter(int argc, char *argv[]) {
     FILE *stream_out = source_out(file_out);
     gzFile fp;
     kseq_t *seq;
-    int l, i;
     char seq_name[512];
     int flag_pass;
 
@@ -631,6 +630,7 @@ int fa_filter(int argc, char *argv[]) {
     hash = kh_init(str);
     int ret;  // return value from hashing
 
+    int l;
     while ((l = kseq_read(seq)) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
         flag_pass = 1;
@@ -657,7 +657,7 @@ int fa_filter(int argc, char *argv[]) {
 
         if (flag_pass) {
             fprintf(stream_out, ">%s\n", seq_name);
-            for (i = 0; i < seq->seq.l; i++) {
+            for (int i = 0; i < seq->seq.l; i++) {
                 if (line != 0 && i != 0 && (i % line) == 0) {
                     fputc('\n', stream_out);
                 }
@@ -689,16 +689,16 @@ int fa_split_name(int argc, char *argv[]) {
     if (optind + 2 > argc) {
         fprintf(stderr,
                 "\n"
-                    "faops split-name - Split an fa file into several files\n"
-                    "                   Using sequence names as file names\n"
-                    "usage:\n"
-                    "    faops split-name [options] <in.fa> <outdir>\n"
-                    "\n"
-                    "options:\n"
-                    "    -l INT     sequence line length [%d]\n"
-                    "\n"
-                    "in.fa  == stdin  means reading from stdin\n"
-                    "\n",
+                        "faops split-name - Split an fa file into several files\n"
+                        "                   Using sequence names as file names\n"
+                        "usage:\n"
+                        "    faops split-name [options] <in.fa> <outdir>\n"
+                        "\n"
+                        "options:\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "\n",
                 line);
         exit(1);
     }
@@ -710,7 +710,6 @@ int fa_split_name(int argc, char *argv[]) {
     gzFile fp;
     kseq_t *seq;
     FILE *fp_out;
-    int l, i;
     char seq_name[512];
     char file_out[1024];
 
@@ -723,6 +722,7 @@ int fa_split_name(int argc, char *argv[]) {
     fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
+    int l;
     while ((l = kseq_read(seq)) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
 
@@ -734,7 +734,7 @@ int fa_split_name(int argc, char *argv[]) {
 
         fprintf(fp_out, ">%s\n", seq_name);
 
-        for (i = 0; i < seq->seq.l; i++) {
+        for (int i = 0; i < seq->seq.l; i++) {
             if (line != 0 && i != 0 && (i % line) == 0) {
                 fputc('\n', fp_out);
             }
@@ -763,17 +763,17 @@ int fa_split_about(int argc, char *argv[]) {
 
     if (optind + 3 > argc) {
         fprintf(
-            stderr,
-            "\n"
-                "faops split-about - Split an fa file into several files\n"
-                "                    of about approx_size bytes each by record\n"
-                "usage:\n"
-                "    faops split-about [options] <in.fa> <approx_size> <outdir>\n"
+                stderr,
                 "\n"
-                "options:\n"
-                "    -l INT     sequence line length [%d]\n"
-                "\n",
-            line);
+                        "faops split-about - Split an fa file into several files\n"
+                        "                    of about approx_size bytes each by record\n"
+                        "usage:\n"
+                        "    faops split-about [options] <in.fa> <approx_size> <outdir>\n"
+                        "\n"
+                        "options:\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n",
+                line);
         exit(1);
     }
 
@@ -785,7 +785,6 @@ int fa_split_about(int argc, char *argv[]) {
     gzFile fp;
     kseq_t *seq;
     FILE *fp_out;
-    int l, i;
     char seq_name[512];
     char file_out[1024];
     int cur_size = 0, file_count = 0, flag_first = 1;
@@ -799,6 +798,7 @@ int fa_split_about(int argc, char *argv[]) {
     fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
+    int l;
     while ((l = kseq_read(seq)) >= 0) {
         if (cur_size == 0) {
             if (flag_first) {
@@ -818,7 +818,7 @@ int fa_split_about(int argc, char *argv[]) {
         sprintf(seq_name, "%s", seq->name.s);
         fprintf(fp_out, ">%s\n", seq_name);
 
-        for (i = 0; i < seq->seq.l; i++) {
+        for (int i = 0; i < seq->seq.l; i++) {
             if (line != 0 && i != 0 && (i % line) == 0) {
                 fputc('\n', fp_out);
             }
@@ -839,26 +839,26 @@ int fa_split_about(int argc, char *argv[]) {
 
 static int usage() {
     fprintf(
-        stderr,
-        "\n"
-            "Usage:     faops <command> [options] <arguments>\n"
-            "Version:   0.2.1\n"
+            stderr,
             "\n"
-            "Commands:\n"
-            "    count          Count base statistics in FA file(s)\n"
-            "    size           Count total bases in FA file(s)\n"
-            "    frag           Extract subsequences from a FA file\n"
-            "    rc             Reverse complement a FA file\n"
-            "    some           Extract some fa records.\n"
-            "    filter         Filter fa records.\n"
-            "    split-name     Splitting by sequence names\n"
-            "    split-about    Splitting to chunks about specified size\n"
-            "\n"
-            "Options:\n"
-            "    There're no global options.\n"
-            "    Type \"faops command-name\" for detailed options of each command.\n"
-            "    Options *MUST* be placed just after subcommand.\n"
-            "\n");
+                    "Usage:     faops <command> [options] <arguments>\n"
+                    "Version:   0.2.2\n"
+                    "\n"
+                    "Commands:\n"
+                    "    count          Count base statistics in FA file(s)\n"
+                    "    size           Count total bases in FA file(s)\n"
+                    "    frag           Extract subsequences from a FA file\n"
+                    "    rc             Reverse complement a FA file\n"
+                    "    some           Extract some fa records.\n"
+                    "    filter         Filter fa records.\n"
+                    "    split-name     Splitting by sequence names\n"
+                    "    split-about    Splitting to chunks about specified size\n"
+                    "\n"
+                    "Options:\n"
+                    "    There're no global options.\n"
+                    "    Type \"faops command-name\" for detailed options of each command.\n"
+                    "    Options *MUST* be placed just after subcommand.\n"
+                    "\n");
     return 1;
 }
 
@@ -890,4 +890,3 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
-
