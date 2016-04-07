@@ -262,6 +262,7 @@ int fa_size(int argc, char *argv[]) {
         fprintf(stderr,
                 "\n"
                         "faops size - count total bases in FA file(s).\n"
+                        "             DO NOT support reading from stdin.\n"
                         "usage:\n"
                         "    faops size <in.fa> [more_files.fa]\n"
                         "\n");
