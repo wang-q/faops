@@ -4,7 +4,7 @@
 #include <zlib.h>
 
 // uint_fast8_t etc
-//#include <stdint.h>
+#include <stdint.h>
 
 // getopt is defined in "unistd.h"
 #include <unistd.h>
