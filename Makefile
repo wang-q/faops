@@ -29,12 +29,6 @@ all: $(SOURCES) $(EXECUTABLE)
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) ${COPTS} $(OBJECTS) $(LDFLAGS) -o $@
 
-readme:
-	echo "# faops: Operate fasta files\n" > README.md
-	echo '```' >> README.md
-	./faops help >> README.md
-	echo '```' >> README.md
-
 .c.o:
 	$(CC) ${COPTS} $(CFLAGS) $< -o $@
 
