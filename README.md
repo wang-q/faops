@@ -27,7 +27,7 @@ Options:
 
 ## Compiling
 
-`faops` can be compiled under Windows with MinGW. 
+`faops` can be compiled under Linux, macOS (gcc or clang) and Windows (MinGW). 
 
 ```bash
 git clone https://github.com/wang-q/faops
