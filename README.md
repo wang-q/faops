@@ -20,5 +20,5 @@ Commands:
 Options:
     There're no global options.
     Type "faops command-name" for detailed options of each command.
-    Options *MUST* be placed just after subcommand.
+    Options *MUST* be placed just after command.
 ```
