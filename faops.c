@@ -2,12 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <zlib.h>
-
-// uint_fast8_t etc
-#include <stdint.h>
-
-// getopt is defined in "unistd.h"
-#include <unistd.h>
+#include <stdint.h> // uint_fast8_t etc
+#include <unistd.h> // getopt
+#include <getopt.h> // http://stackoverflow.com/questions/22575940/getopt-not-included-implicit-declaration-of-function-getopt
 
 // create dir
 #ifdef __MINGW32__
