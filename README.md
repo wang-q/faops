@@ -1,6 +1,6 @@
 [![Travis](https://img.shields.io/travis/wang-q/faops.svg)](https://travis-ci.org/wang-q/faops)
 
-# faops: Operate fasta files
+# `faops` operates fasta files
 
 ```
 $ ./faops help
@@ -35,7 +35,7 @@ cd faops
 make
 ```
 
-## Homebrew or Linuxbrew
+## Installing with Homebrew or Linuxbrew
 
 ```bash
 brew install wang-q/tap/faops
@@ -56,5 +56,5 @@ make test
 
 ## Dependency
 
-* zlib
-* `kseq.h` and `khash.h` from `klib` (bundled)
+* `zlib`
+* `kseq.h` and `khash.h` from [`klib`](https://github.com/attractivechaos/klib) (bundled)

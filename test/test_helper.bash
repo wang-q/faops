@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+tab=$(printf '\t')
+
 assert_equal() {
     if [ "$1" != "$2" ]; then
         echo "expected: [$1]"
