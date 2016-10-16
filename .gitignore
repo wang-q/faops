@@ -1,7 +1,5 @@
 # unneeded directories
 reference
-test
-build
 
 # slickedit project files
 *.vpj
@@ -9,7 +7,7 @@ build
 *.vpwhist
 *.vtg
 
-# webstorm project files
+# IntelliJ project files
 .idea
 
 # put any other files you don't want to check in here,

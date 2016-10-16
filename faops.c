@@ -167,8 +167,7 @@ FILE *source_in(char *file) {
 
     if (strcmp(file, "stdin") == 0) {
         stream = stdin;
-    }
-    else {
+    } else {
         if ((stream = fopen(file, "r")) == NULL) {
             fprintf(stderr, "Cannot open input file [%s]\n", file);
             exit(1);
@@ -184,8 +183,7 @@ FILE *source_out(char *file) {
 
     if (strcmp(file, "stdout") == 0) {
         stream = stdout;
-    }
-    else {
+    } else {
         if ((stream = fopen(file, "w")) == NULL) {
             fprintf(stderr, "Cannot open output file [%s]\n", file);
             exit(1);

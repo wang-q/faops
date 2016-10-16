@@ -38,5 +38,8 @@ readme:
 .c.o:
 	$(CC) ${COPTS} $(CFLAGS) $< -o $@
 
+test: all
+	@bats test --tap
+
 clean:
 	$(RM) $(OBJECTS) $(EXECUTABLE)
