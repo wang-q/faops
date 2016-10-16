@@ -210,7 +210,7 @@ int fa_count(int argc, char *argv[]) {
     printf("#seq\tlen\tA\tC\tG\tT\tN");
     printf("\n");
 
-    for (int f = 0; f < argc; ++f) {
+    for (int f = 1; f < argc; ++f) {
         fp = gzopen(argv[f], "r");
         seq = kseq_init(fp);
 
@@ -407,8 +407,8 @@ int fa_rc(int argc, char *argv[]) {
                         "\n"
                         "options:\n"
                         "    -n         keep name identical (don't prepend RC_)\n"
-                        "    -r         Just Reverse, prepends R_\n"
-                        "    -c         Just Complement, prepends C_\n"
+                        "    -r         just Reverse, prepends R_\n"
+                        "    -c         just Complement, prepends C_\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
@@ -835,7 +835,7 @@ int fa_split_about(int argc, char *argv[]) {
     return 0;
 }
 
-char *version = "0.2.2";
+char *version = "0.2.3";
 char *message =
         "\n"
                 "Usage:     faops <command> [options] <arguments>\n"

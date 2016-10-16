@@ -7,14 +7,14 @@ load test_helper
     assert_success
 }
 
-@test "help contents" {
+@test "help: contents" {
     run $BATS_TEST_DIRNAME/../faops help
     echo "${output}" | grep "Usage"
     assert_success
 }
 
 # xargs trims whitespaces
-@test "lines of help contents" {
+@test "help: lines of contents" {
     run $BATS_TEST_DIRNAME/../faops help
     run bash -c "echo \"${output}\" | wc -l | xargs echo "
     assert_equal "19" "${output}"
