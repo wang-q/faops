@@ -257,9 +257,10 @@ int fa_size(int argc, char *argv[]) {
         fprintf(stderr,
                 "\n"
                         "faops size - count total bases in FA file(s).\n"
-                        "             DO NOT support reading from stdin.\n"
                         "usage:\n"
                         "    faops size <in.fa> [more_files.fa]\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
                         "\n");
         exit(1);
     }
@@ -267,8 +268,9 @@ int fa_size(int argc, char *argv[]) {
     gzFile fp;
     kseq_t *seq;
 
-    for (int f = 0; f < argc; ++f) {
-        fp = gzopen(argv[f], "r");
+    for (int f = 1; f < argc; ++f) {
+        FILE *stream_in = source_in(argv[f]);
+        fp = gzdopen(fileno(stream_in), "r");
         seq = kseq_init(fp);
 
         int l;
@@ -841,14 +843,14 @@ char *message =
                 "\n"
                 "Commands:\n"
                 "    help           print this message\n"
-                "    count          Count base statistics in FA file(s)\n"
-                "    size           Count total bases in FA file(s)\n"
-                "    frag           Extract subsequences from a FA file\n"
-                "    rc             Reverse complement a FA file\n"
-                "    some           Extract some fa records.\n"
-                "    filter         Filter fa records.\n"
-                "    split-name     Splitting by sequence names\n"
-                "    split-about    Splitting to chunks about specified size\n"
+                "    count          count base statistics in FA file(s)\n"
+                "    size           count total bases in FA file(s)\n"
+                "    frag           extract subsequences from a FA file\n"
+                "    rc             reverse complement a FA file\n"
+                "    some           extract some fa records\n"
+                "    filter         filter fa records\n"
+                "    split-name     splitting by sequence names\n"
+                "    split-about    splitting to chunks about specified size\n"
                 "\n"
                 "Options:\n"
                 "    There're no global options.\n"

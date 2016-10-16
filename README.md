@@ -14,8 +14,8 @@ Commands:
     size           Count total bases in FA file(s)
     frag           Extract subsequences from a FA file
     rc             Reverse complement a FA file
-    some           Extract some fa records.
-    filter         Filter fa records.
+    some           Extract some fa records
+    filter         Filter fa records
     split-name     Splitting by sequence names
     split-about    Splitting to chunks about specified size
 
