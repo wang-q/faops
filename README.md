@@ -2,6 +2,10 @@
 
 # `faops` operates fasta files
 
+`faops` is a fast and lightweight tool for operating sequences in the
+FASTA format which can be compressed by gzip.
+
+
 ```
 $ ./faops help
 
@@ -25,9 +29,25 @@ Options:
     Options *MUST* be placed just after command.
 ```
 
+## Examples
+
+* Reverse complement:
+
+        faops rc in.fa out.fa       # prepend RC_ to names
+        faops rc -n in.fa out.fa    # keep original names
+
+* Extract sequences with names in file `list.file`, one sequence name per line:
+
+        faops some in.fa list.file out.fa
+
+* Same as above, but from stdin and to stdout
+
+        cat in.fa | faops some stdin list.file stdout
+
 ## Compiling
 
-`faops` can be compiled under Linux, macOS (gcc or clang) and Windows (MinGW). 
+`faops` can be compiled under Linux, macOS (gcc or clang) and Windows
+(MinGW).
 
 ```bash
 git clone https://github.com/wang-q/faops
@@ -43,11 +63,10 @@ brew install wang-q/tap/faops
 
 ## Tests
 
-Done with [bats](https://github.com/sstephenson/bats).
-Useful articles:
+Done with [bats](https://github.com/sstephenson/bats). Useful articles:
 
-  * https://blog.engineyard.com/2014/bats-test-command-line-tools
-  * http://blog.spike.cx/post/60548255435/testing-bash-scripts-with-bats
+* https://blog.engineyard.com/2014/bats-test-command-line-tools
+* http://blog.spike.cx/post/60548255435/testing-bash-scripts-with-bats
 
 ```bash
 #brew install bats
@@ -57,4 +76,11 @@ make test
 ## Dependency
 
 * `zlib`
-* `kseq.h` and `khash.h` from [`klib`](https://github.com/attractivechaos/klib) (bundled)
+* `kseq.h` and `khash.h` from
+  [`klib`](https://github.com/attractivechaos/klib) (bundled)
+
+## TODOs
+
+* More tests
+* More examples
+* Buildin N50
