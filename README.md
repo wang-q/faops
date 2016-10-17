@@ -5,6 +5,16 @@
 `faops` is a fast and lightweight tool for operating sequences in the
 FASTA format which can be compressed by gzip.
 
+This tool can be regarded as a combination of `faCount`, `faSize`,
+`faFrag`, `faRc`, `faSomeRecords`, `faFilter` and `faSplit` from 
+[UCSC Jim Kent's utilities](http://hgdownload.cse.ucsc.edu/admin/exe/).
+
+Comparing to Kent's `fa*` utilities, `faops` is:
+    * much smaller (kilo vs mega bytes)
+    * easy to compile (only one external dependency)
+    * well tested
+    * contains only one executable file
+    * and can be run under Windows. 
 
 ```
 $ ./faops help
@@ -35,15 +45,15 @@ Options:
 
         faops rc in.fa out.fa       # prepend RC_ to names
         faops rc -n in.fa out.fa    # keep original names
-
-* Extract sequences with names in file `list.file`, one sequence name per line:
+    
+* Extract sequences with names in `list.file`, one name per line:
 
         faops some in.fa list.file out.fa
-
+    
 * Same as above, but from stdin and to stdout
 
         cat in.fa | faops some stdin list.file stdout
-
+    
 ## Compiling
 
 `faops` can be compiled under Linux, macOS (gcc or clang) and Windows
