@@ -6,15 +6,20 @@
 FASTA format which can be compressed by gzip.
 
 This tool can be regarded as a combination of `faCount`, `faSize`,
-`faFrag`, `faRc`, `faSomeRecords`, `faFilter` and `faSplit` from 
+`faFrag`, `faRc`, `faSomeRecords`, `faFilter` and `faSplit` from
 [UCSC Jim Kent's utilities](http://hgdownload.cse.ucsc.edu/admin/exe/).
 
 Comparing to Kent's `fa*` utilities, `faops` is:
+
 * much smaller (kilo vs mega bytes)
 * easy to compile (only one external dependency)
 * well tested
 * contains only one executable file
-* and can be run under Windows. 
+* and can be run under Windows.
+
+`faops` is also inspired/influenced/stealing from
+[`seqtk`](https://github.com/lh3/seqtk) and
+[`ufasta`](http://www.genome.umd.edu/masurca.html).
 
 ```
 $ ./faops help
