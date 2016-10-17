@@ -10,11 +10,11 @@ This tool can be regarded as a combination of `faCount`, `faSize`,
 [UCSC Jim Kent's utilities](http://hgdownload.cse.ucsc.edu/admin/exe/).
 
 Comparing to Kent's `fa*` utilities, `faops` is:
-    * much smaller (kilo vs mega bytes)
-    * easy to compile (only one external dependency)
-    * well tested
-    * contains only one executable file
-    * and can be run under Windows. 
+* much smaller (kilo vs mega bytes)
+* easy to compile (only one external dependency)
+* well tested
+* contains only one executable file
+* and can be run under Windows. 
 
 ```
 $ ./faops help
