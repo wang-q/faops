@@ -16,6 +16,13 @@ load test_helper
     assert_equal "$exp" "$res"
 }
 
+@test "rc: double rc (gz)" {
+    exp=$($BATS_TEST_DIRNAME/../faops filter $BATS_TEST_DIRNAME/ufasta.fa stdout)
+    res=$($BATS_TEST_DIRNAME/../faops rc -n $BATS_TEST_DIRNAME/ufasta.fa.gz stdout \
+        | $BATS_TEST_DIRNAME/../faops rc -n stdin stdout)
+    assert_equal "$exp" "$res"
+}
+
 @test "rc: perl regex" {
     paste <($BATS_TEST_DIRNAME/../faops rc -l 0 $BATS_TEST_DIRNAME/ufasta.fa stdout | grep -v '^>') \
         <($BATS_TEST_DIRNAME/../faops filter -l 0 $BATS_TEST_DIRNAME/ufasta.fa stdout | grep -v '^>') \

@@ -8,6 +8,12 @@ load test_helper
     assert_equal "read1${tab}106" "${lines[1]}"
 }
 
+@test "size: read from gzipped file" {
+    run bash -c "$BATS_TEST_DIRNAME/../faops size $BATS_TEST_DIRNAME/ufasta.fa.gz | head -n 2"
+    assert_equal "read0${tab}359" "${lines[0]}"
+    assert_equal "read1${tab}106" "${lines[1]}"
+}
+
 @test "size: read from stdin" {
     run bash -c "cat $BATS_TEST_DIRNAME/ufasta.fa | $BATS_TEST_DIRNAME/../faops size stdin | head -n 2"
     assert_equal "read0${tab}359" "${lines[0]}"
