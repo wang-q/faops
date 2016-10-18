@@ -855,7 +855,7 @@ char *message =
                 "Options:\n"
                 "    There're no global options.\n"
                 "    Type \"faops command-name\" for detailed options of each command.\n"
-                "    Options *MUST* be placed just after subcommand.\n"
+                "    Options *MUST* be placed just after command.\n"
                 "\n";
 
 static int usage() {

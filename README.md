@@ -3,7 +3,7 @@
 # `faops` operates fasta files
 
 `faops` is a fast and lightweight tool for operating sequences in the
-FASTA format which can be compressed by gzip.
+FASTA format which can be compressed by gzip or bgzip.
 
 This tool can be regarded as a combination of `faCount`, `faSize`,
 `faFrag`, `faRc`, `faSomeRecords`, `faFilter` and `faSplit` from
@@ -15,7 +15,7 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 * easy to compile (only one external dependency)
 * well tested
 * contains only one executable file
-* and can be run under Windows.
+* and can be run under all major OSes (including Windows).
 
 `faops` is also inspired/influenced/stealing from
 [`seqtk`](https://github.com/lh3/seqtk) and
@@ -25,18 +25,18 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 $ ./faops help
 
 Usage:     faops <command> [options] <arguments>
-Version:   0.2.2
+Version:   0.2.3
 
 Commands:
     help           print this message
-    count          Count base statistics in FA file(s)
-    size           Count total bases in FA file(s)
-    frag           Extract subsequences from a FA file
-    rc             Reverse complement a FA file
-    some           Extract some fa records
-    filter         Filter fa records
-    split-name     Splitting by sequence names
-    split-about    Splitting to chunks about specified size
+    count          count base statistics in FA file(s)
+    size           count total bases in FA file(s)
+    frag           extract subsequences from a FA file
+    rc             reverse complement a FA file
+    some           extract some fa records
+    filter         filter fa records
+    split-name     splitting by sequence names
+    split-about    splitting to chunks about specified size
 
 Options:
     There're no global options.
