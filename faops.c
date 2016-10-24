@@ -40,9 +40,6 @@ enum {
     N_BASE_VAL = 4
 };
 
-int nt_val[256];
-int nt_comp[256];
-
 // Code =>  Nucleic Acid(s)
 //  A   =>  Adenine
 //  C   =>  Cytosine
@@ -60,6 +57,7 @@ int nt_comp[256];
 //  D   =>  A or G or T
 //  B   =>  C or G or T
 //  N   =>  A or G or C or T (any)
+int nt_val[256];
 
 void init_nt_val() {
     for (int i = 0; i < ArraySize(nt_val); i++) {
@@ -85,6 +83,8 @@ void init_nt_val() {
 }
 
 //$seq =~ tr/ACGTMRWSYKVHDBNacgtmrwsykvhdbn-/TGCAKYWSRMBDHVNtgcakywsrmbdhvn-/;
+int nt_comp[256];
+
 void init_nt_comp() {
     memset(nt_comp, '\0', sizeof(nt_comp));
 
