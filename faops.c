@@ -211,7 +211,8 @@ int fa_count(int argc, char *argv[]) {
     printf("\n");
 
     for (int f = 1; f < argc; ++f) {
-        fp = gzopen(argv[f], "r");
+        FILE *stream_in = source_in(argv[f]);
+        fp = gzdopen(fileno(stream_in), "r");
         seq = kseq_init(fp);
 
         int l;
@@ -893,7 +894,7 @@ int main(int argc, char *argv[]) {
     else if (strcmp(argv[1], "help") == 0)
         return help();
     else {
-        fprintf(stderr, "[main] unrecognized commad '%s'. Abort!\n", argv[1]);
+        fprintf(stderr, "[main] unrecognized command '%s'. Abort!\n", argv[1]);
         return 1;
     }
     return 0;

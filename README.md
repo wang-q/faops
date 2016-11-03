@@ -58,7 +58,15 @@ Options:
 * Same as above, but from stdin and to stdout
 
         cat in.fa | faops some stdin list.file stdout
-    
+
+* Tidy fasta file to 80 characters of sequence per line
+
+        faops filter -l 80 in.fa out.fa
+
+* All content written on one line
+
+        faops filter -l 0 in.fa out.fa
+
 ## Compiling
 
 `faops` can be compiled under Linux, macOS (gcc or clang) and Windows
