@@ -2,8 +2,8 @@
 
 # `faops` operates fasta files
 
-`faops` is a fast and lightweight tool for operating sequences in the
-FASTA format which can be compressed by gzip or bgzip.
+`faops` is a lightweight tool for operating sequences in the fasta
+format.
 
 This tool can be regarded as a combination of `faCount`, `faSize`,
 `faFrag`, `faRc`, `faSomeRecords`, `faFilter` and `faSplit` from
@@ -15,6 +15,7 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 * easy to compile (only one external dependency)
 * well tested
 * contains only one executable file
+* can operate gzipped (bgzipped) files
 * and can be run under all major OSes (including Windows).
 
 `faops` is also inspired/influenced/stealing from
@@ -58,15 +59,19 @@ Options:
 * Same as above, but from stdin and to stdout
 
         cat in.fa | faops some stdin list.file stdout
-
+    
 * Tidy fasta file to 80 characters of sequence per line
 
         faops filter -l 80 in.fa out.fa
-
+    
 * All content written on one line
 
         faops filter -l 0 in.fa out.fa
+    
+* Convert fastq to fasta:
 
+        faops filter -l 0 in.fq out.fa
+    
 ## Compiling
 
 `faops` can be compiled under Linux, macOS (gcc or clang) and Windows
