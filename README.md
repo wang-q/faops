@@ -106,4 +106,4 @@ make test
 
 * More tests
 * More examples
-* Buildin N50
+* Implement N50 and sort
