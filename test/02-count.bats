@@ -39,3 +39,13 @@ load test_helper
     "
     assert_equal 9317 "${output}"
 }
+
+@test "faCount: without cpg" {
+    if ! hash faCount 2>/dev/null ; then
+        skip "Can't find faCount"
+    fi
+
+    exp=$(faCount $BATS_TEST_DIRNAME/ufasta.fa | perl -anle 'print join qq{\t}, @F[0 .. 6]')
+    res=$($BATS_TEST_DIRNAME/../faops count $BATS_TEST_DIRNAME/ufasta.fa)
+    assert_equal "$exp" "$res"
+}
