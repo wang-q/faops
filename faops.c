@@ -884,9 +884,6 @@ int fa_n50(int argc, char *argv[]) {
 
             lengths[count] = (int) seq->seq.l;
             count++;
-
-//            printf("%s\t%lu", seq->name.s, seq->seq.l);
-//            printf("\n");
         }
 
         kseq_destroy(seq);
@@ -905,7 +902,6 @@ int fa_n50(int argc, char *argv[]) {
     for (int i = 0; i < count; ++i) {
         cur_size = lengths[i];
         total_size += cur_size;
-//        printf("%d\n", total_size);
 
         if (total_size > n50_size) {
             printf("%d\n", cur_size);
@@ -934,7 +930,7 @@ char *message =
                 "    filter         filter fa records\n"
                 "    split-name     splitting by sequence names\n"
                 "    split-about    splitting to chunks about specified size\n"
-                "    n50            Compute N50 and other statistics\n"
+                "    n50            compute N50 and other statistics\n"
                 "\n"
                 "Options:\n"
                 "    There're no global options.\n"
