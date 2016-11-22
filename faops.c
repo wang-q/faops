@@ -852,7 +852,6 @@ int fa_n50(int argc, char *argv[]) {
     int flag_average = 0;
     int genome_size = 0;
     int n_given = 50;
-//    int min_size = -1, max_size = -1, max_n = -1;
     int option = 0;
 
     while ((option = getopt(argc, argv, "HSAs:N:")) != -1) {
@@ -935,9 +934,8 @@ int fa_n50(int argc, char *argv[]) {
         nx_size = (int) (((double) n_given) * ((double) total_size) / 100.0);
     }
 
-//    int prev_size = 0;
     int cur_size = 0;
-    int cumulative_size = 0; // reset
+    int cumulative_size = 0;
 
     for (int i = 0; i < count; ++i) {
         cur_size = lengths[i];
@@ -946,8 +944,6 @@ int fa_n50(int argc, char *argv[]) {
         if (cumulative_size > nx_size) {
             break;
         }
-
-//        prev_size = cur_size;
     }
 
     // print n50
