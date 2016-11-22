@@ -48,12 +48,12 @@ Options:
 
 ## Examples
 
-* Reverse complement:
+* Reverse complement
 
         faops rc in.fa out.fa       # prepend RC_ to names
         faops rc -n in.fa out.fa    # keep original names
     
-* Extract sequences with names in `list.file`, one name per line:
+* Extract sequences with names in `list.file`, one name per line
 
         faops some in.fa list.file out.fa
     
@@ -69,10 +69,22 @@ Options:
 
         faops filter -l 0 in.fa out.fa
     
-* Convert fastq to fasta:
+* Convert fastq to fasta
 
         faops filter -l 0 in.fq out.fa
-    
+
+* Compute N50, clean result
+
+        faops n50 -H in.fa
+
+* Compute N75
+
+        faops n50 -N 75 in.fa
+
+* Compute N90, sum and average of contigs with estimated genome size
+
+        faops n50 -N 90 -S -A -s 10000 in.fa
+
 ## Compiling
 
 `faops` can be compiled under Linux, macOS (gcc or clang) and Windows
@@ -110,6 +122,5 @@ make test
 
 ## TODOs
 
-* More tests
 * More examples
 * Implement sort
