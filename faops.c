@@ -143,6 +143,16 @@ void complement_str(char *str, long length) {
     }
 }
 
+// for qsort
+static int compare_ints_desc(const void *a, const void *b) {
+    int arg1 = *(const int *) a;
+    int arg2 = *(const int *) b;
+
+    if (arg1 < arg2) return 1;
+    if (arg1 > arg2) return -1;
+    return 0;
+}
+
 // Count Ns in sequence
 int count_n(char *str, long length) {
     int n_count = 0;
@@ -518,8 +528,8 @@ int fa_some(int argc, char *argv[]) {
     // variables for hashing
     // from Heng Li's replay to http://www.biostars.org/p/10353/
     int buf_size = 4096;
-    char buf[buf_size];   // buffers for names in list.file
-    khash_t(str) *hash;  // the hash
+    char buf[buf_size]; // buffers for names in list.file
+    khash_t(str) *hash; // the hash
     hash = kh_init(str);
     int ret;           // return value from hashing
     int flag_key = 0;  // check keys' exists
@@ -836,6 +846,78 @@ int fa_split_about(int argc, char *argv[]) {
     return 0;
 }
 
+int fa_n50(int argc, char *argv[]) {
+    if (argc == optind) {
+        fprintf(stderr,
+                "\n"
+                        "faops n50 - compute N50 and other statistics.\n"
+                        "usage:\n"
+                        "    faops n50 <in.fa> [more_files.fa]\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "\n");
+        exit(1);
+    }
+
+    gzFile fp;
+    kseq_t *seq;
+
+    int capacity = 1024;
+    int *lengths = (int *) malloc(capacity * sizeof(int)); // store lengths of sequences
+    int count = 0; // number of sequences
+    int total_size = 0;
+
+    for (int f = 1; f < argc; ++f) {
+        FILE *stream_in = source_in(argv[f]);
+        fp = gzdopen(fileno(stream_in), "r");
+        seq = kseq_init(fp);
+
+        int l;
+        while ((l = kseq_read(seq)) >= 0) {
+            total_size += seq->seq.l;
+
+            // increase capacity on necessary
+            if (count > capacity - 1) {
+                capacity = capacity * 2;
+                lengths = (int *) realloc(lengths, capacity * sizeof(int));
+            }
+
+            lengths[count] = (int) seq->seq.l;
+            count++;
+
+//            printf("%s\t%lu", seq->name.s, seq->seq.l);
+//            printf("\n");
+        }
+
+        kseq_destroy(seq);
+        gzclose(fp);
+    }
+
+    qsort(lengths, (size_t) count, sizeof(int), compare_ints_desc);
+
+    int n50_size = total_size / 2;
+//    fprintf(stderr, "#\tcontig count: %d, total size: %d, one half size: %d\n", count, total_size, n50_size);
+
+//    int prev_size = 0;
+    int cur_size = 0;
+    total_size = 0; // reset
+
+    for (int i = 0; i < count; ++i) {
+        cur_size = lengths[i];
+        total_size += cur_size;
+//        printf("%d\n", total_size);
+
+        if (total_size > n50_size) {
+            printf("%d\n", cur_size);
+            break;
+        }
+
+//        prev_size = cur_size;
+    }
+
+    return 0;
+}
+
 char *version = "0.2.3";
 char *message =
         "\n"
@@ -846,12 +928,13 @@ char *message =
                 "    help           print this message\n"
                 "    count          count base statistics in FA file(s)\n"
                 "    size           count total bases in FA file(s)\n"
-                "    frag           extract subsequences from a FA file\n"
+                "    frag           extract sub-sequences from a FA file\n"
                 "    rc             reverse complement a FA file\n"
                 "    some           extract some fa records\n"
                 "    filter         filter fa records\n"
                 "    split-name     splitting by sequence names\n"
                 "    split-about    splitting to chunks about specified size\n"
+                "    n50            Compute N50 and other statistics\n"
                 "\n"
                 "Options:\n"
                 "    There're no global options.\n"
@@ -875,27 +958,30 @@ int main(int argc, char *argv[]) {
     init_nt_val();
     init_nt_comp();
 
-    if (strcmp(argv[1], "count") == 0)
+    if (strcmp(argv[1], "count") == 0) {
         fa_count(argc - 1, argv + 1);
-    else if (strcmp(argv[1], "size") == 0)
+    } else if (strcmp(argv[1], "size") == 0) {
         fa_size(argc - 1, argv + 1);
-    else if (strcmp(argv[1], "frag") == 0)
+    } else if (strcmp(argv[1], "frag") == 0) {
         fa_frag(argc - 1, argv + 1);
-    else if (strcmp(argv[1], "rc") == 0)
+    } else if (strcmp(argv[1], "rc") == 0) {
         fa_rc(argc - 1, argv + 1);
-    else if (strcmp(argv[1], "some") == 0)
+    } else if (strcmp(argv[1], "some") == 0) {
         fa_some(argc - 1, argv + 1);
-    else if (strcmp(argv[1], "filter") == 0)
+    } else if (strcmp(argv[1], "filter") == 0) {
         fa_filter(argc - 1, argv + 1);
-    else if (strcmp(argv[1], "split-name") == 0)
+    } else if (strcmp(argv[1], "split-name") == 0) {
         fa_split_name(argc - 1, argv + 1);
-    else if (strcmp(argv[1], "split-about") == 0)
+    } else if (strcmp(argv[1], "split-about") == 0) {
         fa_split_about(argc - 1, argv + 1);
-    else if (strcmp(argv[1], "help") == 0)
+    } else if (strcmp(argv[1], "n50") == 0) {
+        fa_n50(argc - 1, argv + 1);
+    } else if (strcmp(argv[1], "help") == 0) {
         return help();
-    else {
+    } else {
         fprintf(stderr, "[main] unrecognized command '%s'. Abort!\n", argv[1]);
         return 1;
     }
+
     return 0;
 }

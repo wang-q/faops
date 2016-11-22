@@ -21,3 +21,5 @@ a.out
 faops
 *.exe
 faops.exe
+
+cmake-build-debug/
