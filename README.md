@@ -83,7 +83,7 @@ Options:
 
 * Compute N90, sum and average of contigs with estimated genome size
 
-        faops n50 -N 90 -S -A -s 10000 in.fa
+        faops n50 -N 90 -S -A -g 10000 in.fa
 
 ## Compiling
 

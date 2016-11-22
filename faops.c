@@ -854,7 +854,7 @@ int fa_n50(int argc, char *argv[]) {
     int n_given = 50;
     int option = 0;
 
-    while ((option = getopt(argc, argv, "HSAs:N:")) != -1) {
+    while ((option = getopt(argc, argv, "HSAg:N:")) != -1) {
         switch (option) {
             case 'H':
                 flag_no_header = 1;
@@ -865,7 +865,7 @@ int fa_n50(int argc, char *argv[]) {
             case 'A':
                 flag_average = 1;
                 break;
-            case 's':
+            case 'g':
                 genome_size = atoi(optarg);
                 break;
             case 'N':
@@ -886,7 +886,7 @@ int fa_n50(int argc, char *argv[]) {
                         "    -N INT     compute Nx statistic [%d]\n"
                         "    -S         compute sum of size of all entries\n"
                         "    -A         compute average length of all entries\n"
-                        "    -s INT     size of genome, instead of total size in files\n"
+                        "    -g INT     size of genome, instead of total size in files\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
                         "\n",

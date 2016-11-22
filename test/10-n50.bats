@@ -14,7 +14,7 @@ load test_helper
 }
 
 @test "n50: set genome size (NG50)" {
-    run $BATS_TEST_DIRNAME/../faops n50 -H -s 10000 $BATS_TEST_DIRNAME/ufasta.fa
+    run $BATS_TEST_DIRNAME/../faops n50 -H -g 10000 $BATS_TEST_DIRNAME/ufasta.fa
     run bash -c "echo \"${output}\" | xargs echo "
     assert_equal "297" "${output}"
 }
