@@ -26,18 +26,19 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 $ ./faops help
 
 Usage:     faops <command> [options] <arguments>
-Version:   0.2.3
+Version:   0.2.4
 
 Commands:
     help           print this message
     count          count base statistics in FA file(s)
     size           count total bases in FA file(s)
-    frag           extract subsequences from a FA file
+    frag           extract sub-sequences from a FA file
     rc             reverse complement a FA file
     some           extract some fa records
     filter         filter fa records
     split-name     splitting by sequence names
     split-about    splitting to chunks about specified size
+    n50            Compute N50 and other statistics
 
 Options:
     There're no global options.
