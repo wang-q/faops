@@ -848,14 +848,22 @@ int fa_split_about(int argc, char *argv[]) {
 
 int fa_n50(int argc, char *argv[]) {
     int flag_no_header = 0;
+    int flag_sum = 0;
+    int flag_average = 0;
     int genome_size = 0;
 //    int min_size = -1, max_size = -1, max_n = -1;
     int option = 0;
 
-    while ((option = getopt(argc, argv, "Hs:")) != -1) {
+    while ((option = getopt(argc, argv, "HSAs:")) != -1) {
         switch (option) {
             case 'H':
                 flag_no_header = 1;
+                break;
+            case 'S':
+                flag_sum = 1;
+                break;
+            case 'A':
+                flag_average = 1;
                 break;
             case 's':
                 genome_size = atoi(optarg);
@@ -878,6 +886,8 @@ int fa_n50(int argc, char *argv[]) {
                         "\n"
                         "options:\n"
                         "    -H         do not display header\n"
+                        "    -S         compute sum of size of all entries\n"
+                        "    -A         compute average length of all entries\n"
                         "    -s         size of genome, instead of total size in files\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
@@ -928,23 +938,41 @@ int fa_n50(int argc, char *argv[]) {
 
 //    int prev_size = 0;
     int cur_size = 0;
-    total_size = 0; // reset
+    int cumulative_size = 0; // reset
 
     for (int i = 0; i < count; ++i) {
         cur_size = lengths[i];
-        total_size += cur_size;
+        cumulative_size += cur_size;
 
-        if (total_size > n50_size) {
-            if (flag_no_header) {
-                printf("%d\n", cur_size);
-            } else {
-                printf("N50\t%d\n", cur_size);
-            }
-
+        if (cumulative_size > n50_size) {
             break;
         }
 
 //        prev_size = cur_size;
+    }
+
+    // print n50
+    if (flag_no_header) {
+        printf("%d\n", cur_size);
+    } else {
+        printf("N50\t%d\n", cur_size);
+    }
+
+    // print sum
+    if (flag_sum) {
+        if (flag_no_header) {
+            printf("%d\n", total_size);
+        } else {
+            printf("S\t%d\n", total_size);
+        }
+    }
+
+    // print average
+    if (flag_average) {
+        if (!flag_no_header) {
+            printf("A\t");
+        }
+        printf("%.2f\n", (double) total_size / count);
     }
 
     return 0;

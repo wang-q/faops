@@ -19,6 +19,18 @@ load test_helper
     assert_equal "297" "${output}"
 }
 
+@test "n50: sum of size" {
+    run $BATS_TEST_DIRNAME/../faops n50 -H -S $BATS_TEST_DIRNAME/ufasta.fa
+    run bash -c "echo \"${output}\" | xargs echo "
+    assert_equal "314 9317" "${output}"
+}
+
+@test "n50: sum and average of size" {
+    run $BATS_TEST_DIRNAME/../faops n50 -H -S -A $BATS_TEST_DIRNAME/ufasta.fa
+    run bash -c "echo \"${output}\" | xargs echo "
+    assert_equal "314 9317 186.34" "${output}"
+}
+
 # ./faops size test/ufasta.fa | perl test/n50.pl stdin
 # $HOME/share/MaSuRCA/bin/ufasta n50 -N50 -H test/ufasta.fa
 # $HOME/share/MaSuRCA/bin/ufasta n50 -N50 -H -s 5000 test/ufasta.fa
