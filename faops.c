@@ -851,10 +851,11 @@ int fa_n50(int argc, char *argv[]) {
     int flag_sum = 0;
     int flag_average = 0;
     int genome_size = 0;
+    int n_given = 50;
 //    int min_size = -1, max_size = -1, max_n = -1;
     int option = 0;
 
-    while ((option = getopt(argc, argv, "HSAs:")) != -1) {
+    while ((option = getopt(argc, argv, "HSAs:N:")) != -1) {
         switch (option) {
             case 'H':
                 flag_no_header = 1;
@@ -868,12 +869,9 @@ int fa_n50(int argc, char *argv[]) {
             case 's':
                 genome_size = atoi(optarg);
                 break;
-//            case 'z':
-//                max_size = atoi(optarg);
-//                break;
-//            case 'n':
-//                max_n = atoi(optarg);
-//                break;
+            case 'N':
+                n_given = atoi(optarg);
+                break;
         }
     }
 
@@ -882,16 +880,18 @@ int fa_n50(int argc, char *argv[]) {
                 "\n"
                         "faops n50 - compute N50 and other statistics.\n"
                         "usage:\n"
-                        "    faops n50 <in.fa> [more_files.fa]\n"
+                        "    faops n50 [options] <in.fa> [more_files.fa]\n"
                         "\n"
                         "options:\n"
                         "    -H         do not display header\n"
+                        "    -N INT     compute Nx statistic [%d]\n"
                         "    -S         compute sum of size of all entries\n"
                         "    -A         compute average length of all entries\n"
-                        "    -s         size of genome, instead of total size in files\n"
+                        "    -s INT     size of genome, instead of total size in files\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
-                        "\n");
+                        "\n",
+                n_given);
         exit(1);
     }
 
@@ -928,13 +928,12 @@ int fa_n50(int argc, char *argv[]) {
 
     qsort(lengths, (size_t) count, sizeof(int), compare_ints_desc);
 
-    int n50_size;
+    int nx_size;
     if (genome_size > 0) {
-        n50_size = genome_size / 2;
+        nx_size = (int) (((double) n_given) * ((double) genome_size) / 100.0);
     } else {
-        n50_size = total_size / 2;
+        nx_size = (int) (((double) n_given) * ((double) total_size) / 100.0);
     }
-//    fprintf(stderr, "#\tcontig count: %d, total size: %d, one half size: %d\n", count, total_size, n50_size);
 
 //    int prev_size = 0;
     int cur_size = 0;
@@ -944,7 +943,7 @@ int fa_n50(int argc, char *argv[]) {
         cur_size = lengths[i];
         cumulative_size += cur_size;
 
-        if (cumulative_size > n50_size) {
+        if (cumulative_size > nx_size) {
             break;
         }
 
@@ -952,19 +951,18 @@ int fa_n50(int argc, char *argv[]) {
     }
 
     // print n50
-    if (flag_no_header) {
-        printf("%d\n", cur_size);
-    } else {
-        printf("N50\t%d\n", cur_size);
+    if (!flag_no_header) {
+        printf("N%d\t", n_given);
     }
+    printf("%d\n", cur_size);
 
     // print sum
     if (flag_sum) {
-        if (flag_no_header) {
-            printf("%d\n", total_size);
-        } else {
-            printf("S\t%d\n", total_size);
+        if (!flag_no_header) {
+            printf("S\t");
         }
+        printf("%d\n", total_size);
+
     }
 
     // print average

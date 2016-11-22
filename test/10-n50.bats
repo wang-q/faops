@@ -31,6 +31,18 @@ load test_helper
     assert_equal "314 9317 186.34" "${output}"
 }
 
+@test "n50: n10" {
+    run $BATS_TEST_DIRNAME/../faops n50 -H -N 10 $BATS_TEST_DIRNAME/ufasta.fa
+    run bash -c "echo \"${output}\" | xargs echo "
+    assert_equal "516" "${output}"
+}
+
+@test "n50: n90 with header" {
+    run $BATS_TEST_DIRNAME/../faops n50 -N 90 $BATS_TEST_DIRNAME/ufasta.fa
+    run bash -c "echo \"${output}\" | xargs echo "
+    assert_equal "N90 112" "${output}"
+}
+
 # ./faops size test/ufasta.fa | perl test/n50.pl stdin
 # $HOME/share/MaSuRCA/bin/ufasta n50 -N50 -H test/ufasta.fa
 # $HOME/share/MaSuRCA/bin/ufasta n50 -N50 -H -s 5000 test/ufasta.fa
