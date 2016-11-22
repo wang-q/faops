@@ -847,12 +847,36 @@ int fa_split_about(int argc, char *argv[]) {
 }
 
 int fa_n50(int argc, char *argv[]) {
-    if (argc == optind) {
+    int flag_no_header = 0;
+//    int min_size = -1, max_size = -1, max_n = -1;
+    int option = 0;
+
+    while ((option = getopt(argc, argv, "H")) != -1) {
+        switch (option) {
+            case 'H':
+                flag_no_header = 1;
+                break;
+//            case 'a':
+//                min_size = atoi(optarg);
+//                break;
+//            case 'z':
+//                max_size = atoi(optarg);
+//                break;
+//            case 'n':
+//                max_n = atoi(optarg);
+//                break;
+        }
+    }
+
+    if (optind + 1 > argc) {
         fprintf(stderr,
                 "\n"
                         "faops n50 - compute N50 and other statistics.\n"
                         "usage:\n"
                         "    faops n50 <in.fa> [more_files.fa]\n"
+                        "\n"
+                        "options:\n"
+                        "    -H         do not display header\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
                         "\n");
@@ -867,7 +891,7 @@ int fa_n50(int argc, char *argv[]) {
     int count = 0; // number of sequences
     int total_size = 0;
 
-    for (int f = 1; f < argc; ++f) {
+    for (int f = optind; f < argc; ++f) {
         FILE *stream_in = source_in(argv[f]);
         fp = gzdopen(fileno(stream_in), "r");
         seq = kseq_init(fp);
@@ -904,7 +928,12 @@ int fa_n50(int argc, char *argv[]) {
         total_size += cur_size;
 
         if (total_size > n50_size) {
-            printf("%d\n", cur_size);
+            if (flag_no_header) {
+                printf("%d\n", cur_size);
+            } else {
+                printf("N50\t%d\n", cur_size);
+            }
+
             break;
         }
 

@@ -2,10 +2,15 @@
 
 load test_helper
 
-@test "n50: read from file" {
-    run $BATS_TEST_DIRNAME/../faops n50 $BATS_TEST_DIRNAME/ufasta.fa
+@test "n50: display header" {
+    run bash -c "$BATS_TEST_DIRNAME/../faops n50 $BATS_TEST_DIRNAME/ufasta.fa"
+    assert_equal "N50${tab}314" "${lines[0]}"
+}
+
+@test "n50: don't display header" {
+    run $BATS_TEST_DIRNAME/../faops n50 -H $BATS_TEST_DIRNAME/ufasta.fa
     run bash -c "echo \"${output}\" | xargs echo "
-    assert_equal 314 "${output}"
+    assert_equal "314" "${output}"
 }
 
 # ./faops size test/ufasta.fa | perl test/n50.pl stdin
