@@ -848,17 +848,18 @@ int fa_split_about(int argc, char *argv[]) {
 
 int fa_n50(int argc, char *argv[]) {
     int flag_no_header = 0;
+    int genome_size = 0;
 //    int min_size = -1, max_size = -1, max_n = -1;
     int option = 0;
 
-    while ((option = getopt(argc, argv, "H")) != -1) {
+    while ((option = getopt(argc, argv, "Hs:")) != -1) {
         switch (option) {
             case 'H':
                 flag_no_header = 1;
                 break;
-//            case 'a':
-//                min_size = atoi(optarg);
-//                break;
+            case 's':
+                genome_size = atoi(optarg);
+                break;
 //            case 'z':
 //                max_size = atoi(optarg);
 //                break;
@@ -877,6 +878,7 @@ int fa_n50(int argc, char *argv[]) {
                         "\n"
                         "options:\n"
                         "    -H         do not display header\n"
+                        "    -s         size of genome, instead of total size in files\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
                         "\n");
@@ -916,7 +918,12 @@ int fa_n50(int argc, char *argv[]) {
 
     qsort(lengths, (size_t) count, sizeof(int), compare_ints_desc);
 
-    int n50_size = total_size / 2;
+    int n50_size;
+    if (genome_size > 0) {
+        n50_size = genome_size / 2;
+    } else {
+        n50_size = total_size / 2;
+    }
 //    fprintf(stderr, "#\tcontig count: %d, total size: %d, one half size: %d\n", count, total_size, n50_size);
 
 //    int prev_size = 0;
