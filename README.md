@@ -38,7 +38,7 @@ Commands:
     filter         filter fa records
     split-name     splitting by sequence names
     split-about    splitting to chunks about specified size
-    n50            Compute N50 and other statistics
+    n50            compute N50 and other statistics
 
 Options:
     There're no global options.
@@ -112,4 +112,4 @@ make test
 
 * More tests
 * More examples
-* Implement N50 and sort
+* Implement sort
