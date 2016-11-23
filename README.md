@@ -60,15 +60,29 @@ Options:
 * Same as above, but from stdin and to stdout
 
         cat in.fa | faops some stdin list.file stdout
-    
+
+* Sort by header strings
+
+        for word in $(cat test/ufasta.fa | grep '>' | sed 's/>//' | sort); do
+            faops some in.fa <(echo ${word}) stdout
+        done
+            > out.fa
+
+* Sort by lengths
+
+        for word in $(faops size in.fa | sort -n -r -k2,2 | cut -f 1); do
+            faops some in.fa <(echo ${word}) stdout
+        done
+            > out.fa
+
 * Tidy fasta file to 80 characters of sequence per line
 
         faops filter -l 80 in.fa out.fa
-    
+
 * All content written on one line
 
         faops filter -l 0 in.fa out.fa
-    
+
 * Convert fastq to fasta
 
         faops filter -l 0 in.fq out.fa
@@ -120,7 +134,13 @@ make test
 * `kseq.h` and `khash.h` from
   [`klib`](https://github.com/attractivechaos/klib) (bundled)
 
-## TODOs
+# AUTHOR
 
-* More examples
-* Implement sort
+Qiang Wang &lt;wang-q@outlook.com&gt;
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Qiang Wang.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
