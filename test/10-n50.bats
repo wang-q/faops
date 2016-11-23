@@ -31,6 +31,12 @@ load test_helper
     assert_equal "314 9317 186.34" "${output}"
 }
 
+@test "n50: E-size" {
+    run $BATS_TEST_DIRNAME/../faops n50 -H -E $BATS_TEST_DIRNAME/ufasta.fa
+    run bash -c "echo \"${output}\" | xargs echo "
+    assert_equal "314 314.70" "${output}"
+}
+
 @test "n50: n10" {
     run $BATS_TEST_DIRNAME/../faops n50 -H -N 10 $BATS_TEST_DIRNAME/ufasta.fa
     run bash -c "echo \"${output}\" | xargs echo "

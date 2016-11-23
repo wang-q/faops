@@ -850,11 +850,12 @@ int fa_n50(int argc, char *argv[]) {
     int flag_no_header = 0;
     int flag_sum = 0;
     int flag_average = 0;
+    int flag_e_size = 0;
     int genome_size = 0;
     int n_given = 50;
     int option = 0;
 
-    while ((option = getopt(argc, argv, "HSAg:N:")) != -1) {
+    while ((option = getopt(argc, argv, "HSAEg:N:")) != -1) {
         switch (option) {
             case 'H':
                 flag_no_header = 1;
@@ -864,6 +865,9 @@ int fa_n50(int argc, char *argv[]) {
                 break;
             case 'A':
                 flag_average = 1;
+                break;
+            case 'E':
+                flag_e_size = 1;
                 break;
             case 'g':
                 genome_size = atoi(optarg);
@@ -886,6 +890,7 @@ int fa_n50(int argc, char *argv[]) {
                         "    -N INT     compute Nx statistic [%d]\n"
                         "    -S         compute sum of size of all entries\n"
                         "    -A         compute average length of all entries\n"
+                        "    -E         compute the E-size (from GAGE)\n"
                         "    -g INT     size of genome, instead of total size in files\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
@@ -927,22 +932,28 @@ int fa_n50(int argc, char *argv[]) {
 
     qsort(lengths, (size_t) count, sizeof(int), compare_ints_desc);
 
-    int nx_size;
+    int goal; // reach n_given% of total_size or genome_size
     if (genome_size > 0) {
-        nx_size = (int) (((double) n_given) * ((double) genome_size) / 100.0);
+        goal = (int) (((double) n_given) * ((double) genome_size) / 100.0);
     } else {
-        nx_size = (int) (((double) n_given) * ((double) total_size) / 100.0);
+        goal = (int) (((double) n_given) * ((double) total_size) / 100.0);
     }
 
-    int cur_size = 0;
     int cumulative_size = 0;
+    double e_size = 0.0; // GAGE E-size
+    int nx_size = 0; // N50 or Nx
 
     for (int i = 0; i < count; ++i) {
-        cur_size = lengths[i];
+        int cur_size = lengths[i];
+
+        int prev_cumulative_size = cumulative_size;
         cumulative_size += cur_size;
 
-        if (cumulative_size > nx_size) {
-            break;
+        e_size = ((double) prev_cumulative_size / (double) cumulative_size) * e_size +
+                 (double) (cur_size * cur_size) / cumulative_size;
+
+        if ((0 == nx_size) && (cumulative_size > goal)) {
+            nx_size = cur_size;
         }
     }
 
@@ -950,7 +961,7 @@ int fa_n50(int argc, char *argv[]) {
     if (!flag_no_header) {
         printf("N%d\t", n_given);
     }
-    printf("%d\n", cur_size);
+    printf("%d\n", nx_size);
 
     // print sum
     if (flag_sum) {
@@ -967,6 +978,14 @@ int fa_n50(int argc, char *argv[]) {
             printf("A\t");
         }
         printf("%.2f\n", (double) total_size / count);
+    }
+
+    // print E-size
+    if (flag_e_size) {
+        if (!flag_no_header) {
+            printf("E\t");
+        }
+        printf("%.2f\n", e_size);
     }
 
     return 0;
