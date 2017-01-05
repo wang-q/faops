@@ -851,11 +851,12 @@ int fa_n50(int argc, char *argv[]) {
     int flag_sum = 0;
     int flag_average = 0;
     int flag_e_size = 0;
+    int flag_count = 0;
     int genome_size = 0;
     int n_given = 50;
     int option = 0;
 
-    while ((option = getopt(argc, argv, "HSAEg:N:")) != -1) {
+    while ((option = getopt(argc, argv, "HSAECg:N:")) != -1) {
         switch (option) {
             case 'H':
                 flag_no_header = 1;
@@ -868,6 +869,9 @@ int fa_n50(int argc, char *argv[]) {
                 break;
             case 'E':
                 flag_e_size = 1;
+                break;
+            case 'C':
+                flag_count = 1;
                 break;
             case 'g':
                 genome_size = atoi(optarg);
@@ -891,6 +895,7 @@ int fa_n50(int argc, char *argv[]) {
                         "    -S         compute sum of size of all entries\n"
                         "    -A         compute average length of all entries\n"
                         "    -E         compute the E-size (from GAGE)\n"
+                        "    -C         count entries\n"
                         "    -g INT     size of genome, instead of total size in files\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
@@ -957,11 +962,13 @@ int fa_n50(int argc, char *argv[]) {
         }
     }
 
-    // print n50
-    if (!flag_no_header) {
-        printf("N%d\t", n_given);
+    // print n50, N == 0 to skip this
+    if (n_given) {
+        if (!flag_no_header) {
+            printf("N%d\t", n_given);
+        }
+        printf("%d\n", nx_size);
     }
-    printf("%d\n", nx_size);
 
     // print sum
     if (flag_sum) {
@@ -988,10 +995,18 @@ int fa_n50(int argc, char *argv[]) {
         printf("%.2f\n", e_size);
     }
 
+    // print count
+    if (flag_count) {
+        if (!flag_no_header) {
+            printf("C\t");
+        }
+        printf("%d\n", count);
+    }
+
     return 0;
 }
 
-char *version = "0.3.0";
+char *version = "0.3.1";
 char *message =
         "\n"
                 "Usage:     faops <command> [options] <arguments>\n"

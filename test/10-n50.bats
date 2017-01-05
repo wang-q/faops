@@ -49,6 +49,12 @@ load test_helper
     assert_equal "N90 112" "${output}"
 }
 
+@test "n50: only count of sequences" {
+    run $BATS_TEST_DIRNAME/../faops n50 -N 0 -C $BATS_TEST_DIRNAME/ufasta.fa
+    run bash -c "echo \"${output}\" | xargs echo "
+    assert_equal "C 50" "${output}"
+}
+
 # ./faops size test/ufasta.fa | perl test/n50.pl stdin
 # $HOME/share/MaSuRCA/bin/ufasta n50 -N50 -H test/ufasta.fa
 # $HOME/share/MaSuRCA/bin/ufasta n50 -N50 -H -s 5000 test/ufasta.fa
