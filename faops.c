@@ -852,7 +852,7 @@ int fa_n50(int argc, char *argv[]) {
     int flag_average = 0;
     int flag_e_size = 0;
     int flag_count = 0;
-    int genome_size = 0;
+    long genome_size = 0;
     int n_given = 50;
     int option = 0;
 
@@ -874,7 +874,7 @@ int fa_n50(int argc, char *argv[]) {
                 flag_count = 1;
                 break;
             case 'g':
-                genome_size = atoi(optarg);
+                genome_size = atol(optarg);
                 break;
             case 'N':
                 n_given = atoi(optarg);
@@ -910,7 +910,7 @@ int fa_n50(int argc, char *argv[]) {
     int capacity = 1024;
     int *lengths = (int *) malloc(capacity * sizeof(int)); // store lengths of sequences
     int count = 0; // number of sequences
-    int total_size = 0;
+    long total_size = 0;
 
     for (int f = optind; f < argc; ++f) {
         FILE *stream_in = source_in(argv[f]);
@@ -944,14 +944,14 @@ int fa_n50(int argc, char *argv[]) {
         goal = (int) (((double) n_given) * ((double) total_size) / 100.0);
     }
 
-    int cumulative_size = 0;
+    long cumulative_size = 0;
     double e_size = 0.0; // GAGE E-size
     int nx_size = 0; // N50 or Nx
 
     for (int i = 0; i < count; ++i) {
         int cur_size = lengths[i];
 
-        int prev_cumulative_size = cumulative_size;
+        long prev_cumulative_size = cumulative_size;
         cumulative_size += cur_size;
 
         e_size = ((double) prev_cumulative_size / (double) cumulative_size) * e_size +
@@ -975,7 +975,7 @@ int fa_n50(int argc, char *argv[]) {
         if (!flag_no_header) {
             printf("S\t");
         }
-        printf("%d\n", total_size);
+        printf("%ld\n", total_size);
 
     }
 
@@ -1006,7 +1006,7 @@ int fa_n50(int argc, char *argv[]) {
     return 0;
 }
 
-char *version = "0.3.1";
+char *version = "0.3.2";
 char *message =
         "\n"
                 "Usage:     faops <command> [options] <arguments>\n"
