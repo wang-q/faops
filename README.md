@@ -26,7 +26,7 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 $ ./faops help
 
 Usage:     faops <command> [options] <arguments>
-Version:   0.3.2
+Version:   0.3.3
 
 Commands:
     help           print this message
@@ -52,53 +52,51 @@ Options:
 
         faops rc test/ufasta.fa out.fa       # prepend RC_ to names
         faops rc -n test/ufasta.fa out.fa    # keep original names
-    
+
 * Extract sequences with names in `list.file`, one name per line
 
         faops some test/ufasta.fa list.file out.fa
-    
+
 * Same as above, but from stdin and to stdout
 
         cat test/ufasta.fa | faops some stdin list.file stdout
-    
+
 * Sort by header strings
 
         for word in $(cat test/ufasta.fa | grep '>' | sed 's/>//' | sort); do
             faops some test/ufasta.fa <(echo ${word}) stdout
-        done
-            > out.fa
-    
+        done > out.fa
+
 * Sort by lengths
 
         for word in $(faops size test/ufasta.fa | sort -n -r -k2,2 | cut -f 1); do
             faops some test/ufasta.fa <(echo ${word}) stdout
-        done
-            > out.fa
-    
+        done > out.fa
+
 * Tidy fasta file to 80 characters of sequence per line
 
         faops filter -l 80 test/ufasta.fa out.fa
-    
+
 * All content written on one line
 
         faops filter -l 0 test/ufasta.fa out.fa
-    
+
 * Convert fastq to fasta
 
         faops filter -l 0 in.fq out.fa
-    
+
 * Compute N50, clean result
 
         faops n50 -H test/ufasta.fa
-    
+
 * Compute N75
 
         faops n50 -N 75 test/ufasta.fa
-    
+
 * Compute N90, sum and average of contigs with estimated genome size
 
         faops n50 -N 90 -S -A -g 10000 test/ufasta.fa
-    
+
 ## Compiling
 
 `faops` can be compiled under Linux, macOS (gcc or clang) and Windows

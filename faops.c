@@ -1040,7 +1040,7 @@ int fa_n50(int argc, char *argv[]) {
     return 0;
 }
 
-char *version = "0.3.2";
+char *version = "0.3.3";
 char *message =
         "\n"
                 "Usage:     faops <command> [options] <arguments>\n"
