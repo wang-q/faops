@@ -305,6 +305,9 @@ int fa_frag(int argc, char *argv[]) {
             case 'l':
                 line = atoi(optarg);
                 break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
         }
     }
 
@@ -404,6 +407,9 @@ int fa_rc(int argc, char *argv[]) {
             case 'l':
                 line = atoi(optarg);
                 break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
         }
     }
 
@@ -484,6 +490,9 @@ int fa_some(int argc, char *argv[]) {
             case 'l':
                 line = atoi(optarg);
                 break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
         }
     }
 
@@ -573,13 +582,17 @@ int fa_some(int argc, char *argv[]) {
 
 int fa_filter(int argc, char *argv[]) {
     int flag_u = 0;
+    int flag_b = 0;
     int min_size = -1, max_size = -1, max_n = -1;
-    int option = 0, line = 80;
+    int option = 0, opt_line = 80;
 
-    while ((option = getopt(argc, argv, "ua:z:n:l:")) != -1) {
+    while ((option = getopt(argc, argv, "uba:z:n:l:")) != -1) {
         switch (option) {
             case 'u':
                 flag_u = 1;
+                break;
+            case 'b':
+                flag_b = 1;
                 break;
             case 'a':
                 min_size = atoi(optarg);
@@ -591,9 +604,16 @@ int fa_filter(int argc, char *argv[]) {
                 max_n = atoi(optarg);
                 break;
             case 'l':
-                line = atoi(optarg);
+                opt_line = atoi(optarg);
                 break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
         }
+    }
+
+    if (flag_b) {
+        opt_line = 0;
     }
 
     if (optind + 2 > argc) {
@@ -609,6 +629,7 @@ int fa_filter(int argc, char *argv[]) {
                         "    -z INT     pass sequences this size or smaller ('z'-biggest)\n"
                         "    -n INT     pass sequences with fewer than this number of N's\n"
                         "    -u         Unique, removes duplicate ids, keeping the first\n"
+                        "    -b         pretend to be a blocked fasta file\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
@@ -617,7 +638,7 @@ int fa_filter(int argc, char *argv[]) {
                         "Not all faFilter options were implemented.\n"
                         "Names' wildcards are easily accomplished by \"faops some\".\n"
                         "\n",
-                line);
+                opt_line);
         exit(1);
     }
 
@@ -667,12 +688,16 @@ int fa_filter(int argc, char *argv[]) {
         if (flag_pass) {
             fprintf(stream_out, ">%s\n", seq_name);
             for (int i = 0; i < seq->seq.l; i++) {
-                if (line != 0 && i != 0 && (i % line) == 0) {
+                if (opt_line != 0 && i != 0 && (i % opt_line) == 0) {
                     fputc('\n', stream_out);
                 }
                 fputc(seq->seq.s[i], stream_out);
             }
             fputc('\n', stream_out);
+
+            if (flag_b) {
+                fputc('\n', stream_out);
+            }
         }
     }
 
@@ -692,6 +717,9 @@ int fa_split_name(int argc, char *argv[]) {
             case 'l':
                 line = atoi(optarg);
                 break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
         }
     }
 
@@ -767,6 +795,9 @@ int fa_split_about(int argc, char *argv[]) {
             case 'l':
                 line = atoi(optarg);
                 break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
         }
     }
 
@@ -879,6 +910,9 @@ int fa_n50(int argc, char *argv[]) {
             case 'N':
                 n_given = atoi(optarg);
                 break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
         }
     }
 

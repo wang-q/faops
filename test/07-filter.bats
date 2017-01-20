@@ -8,6 +8,12 @@ load test_helper
     assert_equal "$(( exp * 2 ))" "$res"
 }
 
+@test "filter: as formatter, blocked fasta files" {
+    exp=$($BATS_TEST_DIRNAME/../faops size $BATS_TEST_DIRNAME/ufasta.fa | wc -l | xargs echo)
+    res=$($BATS_TEST_DIRNAME/../faops filter -b $BATS_TEST_DIRNAME/ufasta.fa stdout | wc -l | xargs echo)
+    assert_equal "$(( exp * 3 ))" "$res"
+}
+
 @test "filter: as formatter, identical headers" {
     exp=$(grep '^>' $BATS_TEST_DIRNAME/ufasta.fa)
     res=$($BATS_TEST_DIRNAME/../faops filter -l 0 $BATS_TEST_DIRNAME/ufasta.fa stdout | grep '^>')
