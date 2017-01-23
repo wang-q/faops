@@ -225,8 +225,7 @@ int fa_count(int argc, char *argv[]) {
         fp = gzdopen(fileno(stream_in), "r");
         seq = kseq_init(fp);
 
-        int l;
-        while ((l = kseq_read(seq)) >= 0) {
+        while (kseq_read(seq) >= 0) {
             unsigned long length = 0;
             unsigned long base_count[5] = {0};
 
@@ -284,8 +283,7 @@ int fa_size(int argc, char *argv[]) {
         fp = gzdopen(fileno(stream_in), "r");
         seq = kseq_init(fp);
 
-        int l;
-        while ((l = kseq_read(seq)) >= 0) {
+        while (kseq_read(seq) >= 0) {
             printf("%s\t%lu", seq->name.s, seq->seq.l);
             printf("\n");
         }
@@ -349,8 +347,7 @@ int fa_frag(int argc, char *argv[]) {
     fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
-    int l;
-    while ((l = kseq_read(seq)) >= 0) {
+    while (kseq_read(seq) >= 0) {
         if (!is_first) {
             fprintf(stderr, "More than one sequence in %s, just using first\n",
                     file_in);
@@ -360,7 +357,7 @@ int fa_frag(int argc, char *argv[]) {
         if (end > seq->seq.l) {
             fprintf(stderr, "%s only has %zu bases, truncating\n", seq->name.s,
                     seq->seq.l);
-            end = seq->seq.l;
+            end = (int) seq->seq.l;
             if (start >= end) {
                 fprintf(stderr, "Sorry, no sequence left after truncating\n");
                 exit(1);
@@ -447,8 +444,7 @@ int fa_rc(int argc, char *argv[]) {
     fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
-    int l;
-    while ((l = kseq_read(seq)) >= 0) {
+    while (kseq_read(seq) >= 0) {
         sprintf(seq_name, "%s%s", prefix, seq->name.s);
         fprintf(stream_out, ">%s\n", seq_name);
 
@@ -548,8 +544,7 @@ int fa_some(int argc, char *argv[]) {
     }
     fclose(fp_list);
 
-    int l;
-    while ((l = kseq_read(seq)) >= 0) {
+    while (kseq_read(seq) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
 
         flag_key = (kh_get(str, hash, seq_name) != kh_end(hash));
@@ -660,8 +655,7 @@ int fa_filter(int argc, char *argv[]) {
     hash = kh_init(str);
     int ret;  // return value from hashing
 
-    int l;
-    while ((l = kseq_read(seq)) >= 0) {
+    while (kseq_read(seq) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
         flag_pass = 1;
 
@@ -759,8 +753,7 @@ int fa_split_name(int argc, char *argv[]) {
     fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
-    int l;
-    while ((l = kseq_read(seq)) >= 0) {
+    while (kseq_read(seq) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
 
         sprintf(file_out, "%s/%s.fa", path_out, seq_name);
@@ -838,8 +831,7 @@ int fa_split_about(int argc, char *argv[]) {
     fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
-    int l;
-    while ((l = kseq_read(seq)) >= 0) {
+    while (kseq_read(seq) >= 0) {
         if (cur_size == 0) {
             if (flag_first) {
                 flag_first = 0;
@@ -951,8 +943,7 @@ int fa_n50(int argc, char *argv[]) {
         fp = gzdopen(fileno(stream_in), "r");
         seq = kseq_init(fp);
 
-        int l;
-        while ((l = kseq_read(seq)) >= 0) {
+        while (kseq_read(seq) >= 0) {
             total_size += seq->seq.l;
 
             // increase capacity on necessary
