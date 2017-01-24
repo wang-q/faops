@@ -64,15 +64,15 @@ Options:
 
 * Sort by header strings
 
-        for word in $(cat test/ufasta.fa | grep '>' | sed 's/>//' | sort); do
-            faops some test/ufasta.fa <(echo ${word}) stdout
-        done > out.fa
+        faops order test/ufasta.fa \
+            <(cat test/ufasta.fa | grep '>' | sed 's/>//' | sort) \
+            out.fa
 
 * Sort by lengths
 
-        for word in $(faops size test/ufasta.fa | sort -n -r -k2,2 | cut -f 1); do
-            faops some test/ufasta.fa <(echo ${word}) stdout
-        done > out.fa
+        faops order test/ufasta.fa \
+            <(faops size test/ufasta.fa | sort -n -r -k2,2 | cut -f 1) \
+            out2.fa
 
 * Tidy fasta file to 80 characters of sequence per line
 
