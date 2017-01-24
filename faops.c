@@ -524,35 +524,36 @@ int fa_some(int argc, char *argv[]) {
     fp = gzdopen(fileno(stream_in), "r");
     seq = kseq_init(fp);
 
-    //  Read list.file to a hash table
-    if ((fp_list = fopen(file_list, "r")) == NULL) {
-        fprintf(stderr, "Cannot open list file [%s]\n", file_list);
-        exit(1);
-    }
-
     // variables for hashing
     // from Heng Li's replay to http://www.biostars.org/p/10353/
     // and https://github.com/attractivechaos/klib/issues/49
-    int buf_size = 4096;
-    char buf[buf_size]; // buffers for names in list.file
-    khash_t(str) *hash; // the hash
+    khash_t(str) *hash; // the hash of list
     hash = kh_init(str);
     khint_t key;        // the key
-    int ret;            // return value from hashing
-    int flag_key = 0;   // check keys' exists
 
-    while (fscanf(fp_list, "%s\n", buf) == 1) {
-        key = kh_put(str, hash, strdup(buf), &ret);
-        kh_val(hash, key) = 1;
+    //  Read list.file to a hash table
+    int serial = 0;// serials in list.file
+    {
+        if ((fp_list = fopen(file_list, "r")) == NULL) {
+            fprintf(stderr, "Cannot open list file [%s]\n", file_list);
+            exit(1);
+        }
+
+        int ret;            // return value from hashing
+        int buf_size = 4096;
+        char buf[buf_size]; // buffers for names in list.file
+        while (fscanf(fp_list, "%s\n", buf) == 1) {
+            key = kh_put(str, hash, strdup(buf), &ret);
+            kh_val(hash, key) = serial;
+            serial++;
+        }
+        fclose(fp_list);
     }
-    fclose(fp_list);
 
+    int flag_key = 0;   // check keys' exists
     while (kseq_read(seq) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
-
         flag_key = (kh_get(str, hash, seq_name) != kh_end(hash));
-
-        // fprintf(stderr, "Seq: [%s];\tExists:[%d]\n", seq_name, flag_key);
 
         //          invert 0    invert 1
         // key  1      1            0
@@ -570,6 +571,139 @@ int fa_some(int argc, char *argv[]) {
         }
     }
 
+    kh_destroy(str, hash);
+    kseq_destroy(seq);
+    gzclose(fp);
+    if (strcmp(file_out, "stdout") != 0) {
+        fclose(stream_out);
+    }
+    return 0;
+}
+
+static void cpy_kstr(kstring_t *dst, const kstring_t *src) {
+    if (src->l == 0) return;
+    if (src->l + 1 > dst->m) {
+        dst->m = src->l + 1;
+        kroundup32(dst->m);
+        dst->s = realloc(dst->s, dst->m);
+    }
+    dst->l = src->l;
+    memcpy(dst->s, src->s, src->l + 1);
+}
+
+static void cpy_kseq(kseq_t *dst, const kseq_t *src) {
+    cpy_kstr(&dst->name, &src->name);
+    cpy_kstr(&dst->seq, &src->seq);
+    cpy_kstr(&dst->qual, &src->qual);
+    cpy_kstr(&dst->comment, &src->comment);
+}
+
+int fa_order(int argc, char *argv[]) {
+    int option = 0, line = 80;
+
+    while ((option = getopt(argc, argv, "il:")) != -1) {
+        switch (option) {
+            case 'l':
+                line = atoi(optarg);
+                break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
+        }
+    }
+
+    if (optind + 3 > argc) {
+        fprintf(stderr,
+                "\n"
+                        "faops order - Extract multiple fa sequences by the given order.\n"
+                        "              Consume much more memory for load all sequences in memory.\n"
+                        "usage:\n"
+                        "    faops order [options] <in.fa> <list.file> <out.fa>\n"
+                        "\n"
+                        "options:\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "out.fa == stdout means writing to stdout\n"
+                        "\n",
+                line);
+        exit(1);
+    }
+
+    char *file_in = argv[optind];
+    char *file_list = argv[optind + 1];
+    char *file_out = argv[optind + 2];
+
+    FILE *stream_in = source_in(file_in);
+    FILE *stream_out = source_out(file_out);
+    gzFile fp;
+    kseq_t *seq;
+
+    fp = gzdopen(fileno(stream_in), "r");
+    seq = kseq_init(fp);
+
+    // variables for hashing
+    // from Heng Li's replay to http://www.biostars.org/p/10353/
+    // and https://github.com/attractivechaos/klib/issues/49
+    khash_t(str) *hash; // the hash of list
+    hash = kh_init(str);
+    khint_t entry;        // the key-value pair
+
+    //  Read list.file to a hash table
+    int serial = 0;// serials in list.file
+    {
+        FILE *fp_list;
+
+        if ((fp_list = fopen(file_list, "r")) == NULL) {
+            fprintf(stderr, "Cannot open list file [%s]\n", file_list);
+            exit(1);
+        }
+
+        int ret;            // return value from hashing
+        int buf_size = 4096;
+        char buf[buf_size]; // buffers for names in list.file
+        while (fscanf(fp_list, "%s\n", buf) == 1) {
+            entry = kh_put(str, hash, strdup(buf), &ret);
+            kh_val(hash, entry) = serial;
+//            fprintf(stderr, "Key: [%s];\tValue:[%d]\n", kh_key(hash, entry), kh_val(hash, entry));
+
+            serial++;
+        }
+        fclose(fp_list);
+    }
+
+    // load all sequences into buffer
+    kseq_t *buf_seq = 0;
+    buf_seq = calloc((size_t) serial, sizeof(kseq_t));
+
+    while (kseq_read(seq) >= 0) {
+        char seq_name[512];
+        sprintf(seq_name, "%s", seq->name.s);
+
+        entry = kh_get(str, hash, seq_name);
+        if (entry != kh_end(hash)) {
+            cpy_kseq(&buf_seq[kh_val(hash, entry)], seq);
+        }
+    }
+
+    for (int idx = 0; idx < serial; ++idx) {
+        kseq_t *seq_l = &buf_seq[idx];
+
+        fprintf(stream_out, ">%s\n", seq_l->name.s);
+        for (int i = 0; i < seq_l->seq.l; i++) {
+            if (line != 0 && i != 0 && (i % line) == 0) {
+                fputc('\n', stream_out);
+            }
+            fputc(seq_l->seq.s[i], stream_out);
+        }
+        fputc('\n', stream_out);
+
+        free(seq_l->seq.s);
+        free(seq_l->qual.s);
+        free(seq_l->name.s);
+    }
+
+    if (buf_seq != NULL) free(buf_seq);
     kh_destroy(str, hash);
     kseq_destroy(seq);
     gzclose(fp);
@@ -1048,6 +1182,7 @@ char *message =
                 "    frag           extract sub-sequences from a FA file\n"
                 "    rc             reverse complement a FA file\n"
                 "    some           extract some fa records\n"
+                "    order          extract some fa records by the given order\n"
                 "    filter         filter fa records\n"
                 "    split-name     splitting by sequence names\n"
                 "    split-about    splitting to chunks about specified size\n"
@@ -1085,6 +1220,8 @@ int main(int argc, char *argv[]) {
         fa_rc(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "some") == 0) {
         fa_some(argc - 1, argv + 1);
+    } else if (strcmp(argv[1], "order") == 0) {
+        fa_order(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "filter") == 0) {
         fa_filter(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "split-name") == 0) {
