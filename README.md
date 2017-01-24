@@ -26,7 +26,7 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 $ ./faops help
 
 Usage:     faops <command> [options] <arguments>
-Version:   0.3.3
+Version:   0.4.0
 
 Commands:
     help           print this message
@@ -35,6 +35,7 @@ Commands:
     frag           extract sub-sequences from a FA file
     rc             reverse complement a FA file
     some           extract some fa records
+    order          extract some fa records by the given order
     filter         filter fa records
     split-name     splitting by sequence names
     split-about    splitting to chunks about specified size
