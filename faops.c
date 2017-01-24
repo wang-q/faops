@@ -532,15 +532,18 @@ int fa_some(int argc, char *argv[]) {
 
     // variables for hashing
     // from Heng Li's replay to http://www.biostars.org/p/10353/
+    // and https://github.com/attractivechaos/klib/issues/49
     int buf_size = 4096;
     char buf[buf_size]; // buffers for names in list.file
     khash_t(str) *hash; // the hash
     hash = kh_init(str);
-    int ret;           // return value from hashing
-    int flag_key = 0;  // check keys' exists
+    khint_t key;        // the key
+    int ret;            // return value from hashing
+    int flag_key = 0;   // check keys' exists
 
     while (fscanf(fp_list, "%s\n", buf) == 1) {
-        kh_put(str, hash, strdup(buf), &ret);  // FIXME: check ret
+        key = kh_put(str, hash, strdup(buf), &ret);
+        kh_val(hash, key) = 1;
     }
     fclose(fp_list);
 
@@ -548,6 +551,7 @@ int fa_some(int argc, char *argv[]) {
         sprintf(seq_name, "%s", seq->name.s);
 
         flag_key = (kh_get(str, hash, seq_name) != kh_end(hash));
+
         // fprintf(stderr, "Seq: [%s];\tExists:[%d]\n", seq_name, flag_key);
 
         //          invert 0    invert 1
@@ -566,7 +570,7 @@ int fa_some(int argc, char *argv[]) {
         }
     }
 
-    kh_destroy(str, hash);  // FIXME: free keys before destroy
+    kh_destroy(str, hash);
     kseq_destroy(seq);
     gzclose(fp);
     if (strcmp(file_out, "stdout") != 0) {
