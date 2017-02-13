@@ -1,12 +1,6 @@
 # unneeded directories
 reference
 
-# slickedit project files
-*.vpj
-*.vpw
-*.vpwhist
-*.vtg
-
 # IntelliJ project files
 .idea
 
