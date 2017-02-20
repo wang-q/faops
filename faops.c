@@ -718,6 +718,103 @@ int fa_order(int argc, char *argv[]) {
     return 0;
 }
 
+int fa_replace(int argc, char *argv[]) {
+    int option = 0, line = 80;
+
+    while ((option = getopt(argc, argv, "l:")) != -1) {
+        switch (option) {
+            case 'l':
+                line = atoi(optarg);
+                break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
+        }
+    }
+
+    if (optind + 3 > argc) {
+        fprintf(stderr,
+                "\n"
+                        "faops replace - Replace headers from a FA file\n"
+                        "usage:\n"
+                        "    faops replace [options] <in.fa> <replace.tsv> <out.fa>\n"
+                        "\n"
+                        "options:\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "<replace.tsv> is a tab-separated file containing two fields\n"
+                        "    original_name\treplace_name\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "out.fa == stdout means writing to stdout\n"
+                        "\n",
+                line);
+        exit(1);
+    }
+
+    char *file_in = argv[optind];
+    char *file_list = argv[optind + 1];
+    char *file_out = argv[optind + 2];
+
+    FILE *stream_in = source_in(file_in);
+    FILE *stream_out = source_out(file_out);
+    gzFile fp;
+    kseq_t *seq;
+    FILE *fp_list;
+    char seq_name[512];
+
+    fp = gzdopen(fileno(stream_in), "r");
+    seq = kseq_init(fp);
+
+    //  Read replace.tsv to a hash table
+    khash_t(str2str) *hash;
+    hash = kh_init(str2str);
+    {
+        if ((fp_list = fopen(file_list, "r")) == NULL) {
+            fprintf(stderr, "Cannot open list file [%s]\n", file_list);
+            exit(1);
+        }
+
+        int ret;            // return value from hashing
+        int buf_size = 4096;
+        char buf1[buf_size]; // buffers for original_name in replace.tsv
+        char buf2[buf_size]; // buffers for replace_name in replace.tsv
+        while (fscanf(fp_list, "%s\t%s\n", buf1, buf2) == 2) {
+            khint_t entry = kh_put(str2str, hash, strdup(buf1), &ret);
+            kh_val(hash, entry) = strdup(buf2);
+//            fprintf(stderr, "Key: [%s];\tValue:[%s]\n", kh_key(hash, entry), kh_val(hash, entry));
+        }
+        fclose(fp_list);
+    }
+
+    while (kseq_read(seq) >= 0) {
+        sprintf(seq_name, "%s", seq->name.s);
+
+        khint_t entry = kh_get(str2str, hash, seq_name);
+        if (entry != kh_end(hash)) {
+            fprintf(stream_out, ">%s\n", kh_val(hash, entry));
+        } else {
+            fprintf(stream_out, ">%s\n", seq_name);
+        }
+
+        for (int i = 0; i < seq->seq.l; i++) {
+            if (line != 0 && i != 0 && (i % line) == 0) {
+                fputc('\n', stream_out);
+            }
+            fputc(seq->seq.s[i], stream_out);
+        }
+        fputc('\n', stream_out);
+    }
+
+    kh_destroy(str2str, hash);
+    kseq_destroy(seq);
+    gzclose(fp);
+    if (strcmp(file_out, "stdout") != 0) {
+        fclose(stream_out);
+    }
+    return 0;
+}
+
 int fa_filter(int argc, char *argv[]) {
     int flag_u = 0;
     int flag_b = 0;
@@ -1188,6 +1285,7 @@ char *message =
                 "    rc             reverse complement a FA file\n"
                 "    some           extract some fa records\n"
                 "    order          extract some fa records by the given order\n"
+                "    replace        replace headers from a FA file\n"
                 "    filter         filter fa records\n"
                 "    split-name     splitting by sequence names\n"
                 "    split-about    splitting to chunks about specified size\n"
@@ -1227,6 +1325,8 @@ int main(int argc, char *argv[]) {
         fa_some(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "order") == 0) {
         fa_order(argc - 1, argv + 1);
+    } else if (strcmp(argv[1], "replace") == 0) {
+        fa_replace(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "filter") == 0) {
         fa_filter(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "split-name") == 0) {
