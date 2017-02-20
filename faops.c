@@ -21,11 +21,16 @@
 
 KSEQ_INIT(gzFile, gzread)
 
-// **str** will be the name of HASH throughout the whole file
-// key is string, value is int
+// khash init
 #include "khash.h"
 
-KHASH_MAP_INIT_STR(str, int)
+// **str2int** will be the name of HASH throughout the whole file
+// key is string, value is int
+KHASH_MAP_INIT_STR(str2int, int)
+
+// **str2str** will be the name of HASH throughout the whole file
+// key is string, value is string
+KHASH_MAP_INIT_STR(str2str, char*)
 
 // this macro doesn't work on a decayed pointer,
 // e.g. array name passed to a subroutine
@@ -527,8 +532,8 @@ int fa_some(int argc, char *argv[]) {
     // variables for hashing
     // from Heng Li's replay to http://www.biostars.org/p/10353/
     // and https://github.com/attractivechaos/klib/issues/49
-    khash_t(str) *hash; // the hash of list
-    hash = kh_init(str);
+    khash_t(str2int) *hash; // the hash of list
+    hash = kh_init(str2int);
     khint_t key;        // the key
 
     //  Read list.file to a hash table
@@ -543,7 +548,7 @@ int fa_some(int argc, char *argv[]) {
         int buf_size = 4096;
         char buf[buf_size]; // buffers for names in list.file
         while (fscanf(fp_list, "%s\n", buf) == 1) {
-            key = kh_put(str, hash, strdup(buf), &ret);
+            key = kh_put(str2int, hash, strdup(buf), &ret);
             kh_val(hash, key) = serial;
             serial++;
         }
@@ -553,7 +558,7 @@ int fa_some(int argc, char *argv[]) {
     int flag_key = 0;   // check keys' exists
     while (kseq_read(seq) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
-        flag_key = (kh_get(str, hash, seq_name) != kh_end(hash));
+        flag_key = (kh_get(str2int, hash, seq_name) != kh_end(hash));
 
         //          invert 0    invert 1
         // key  1      1            0
@@ -571,7 +576,7 @@ int fa_some(int argc, char *argv[]) {
         }
     }
 
-    kh_destroy(str, hash);
+    kh_destroy(str2int, hash);
     kseq_destroy(seq);
     gzclose(fp);
     if (strcmp(file_out, "stdout") != 0) {
@@ -645,8 +650,8 @@ int fa_order(int argc, char *argv[]) {
     // variables for hashing
     // from Heng Li's replay to http://www.biostars.org/p/10353/
     // and https://github.com/attractivechaos/klib/issues/49
-    khash_t(str) *hash; // the hash of list
-    hash = kh_init(str);
+    khash_t(str2int) *hash; // the hash of list
+    hash = kh_init(str2int);
     khint_t entry;        // the key-value pair
 
     //  Read list.file to a hash table
@@ -663,7 +668,7 @@ int fa_order(int argc, char *argv[]) {
         int buf_size = 4096;
         char buf[buf_size]; // buffers for names in list.file
         while (fscanf(fp_list, "%s\n", buf) == 1) {
-            entry = kh_put(str, hash, strdup(buf), &ret);
+            entry = kh_put(str2int, hash, strdup(buf), &ret);
             kh_val(hash, entry) = serial;
 //            fprintf(stderr, "Key: [%s];\tValue:[%d]\n", kh_key(hash, entry), kh_val(hash, entry));
 
@@ -680,7 +685,7 @@ int fa_order(int argc, char *argv[]) {
         char seq_name[512];
         sprintf(seq_name, "%s", seq->name.s);
 
-        entry = kh_get(str, hash, seq_name);
+        entry = kh_get(str2int, hash, seq_name);
         if (entry != kh_end(hash)) {
             cpy_kseq(&buf_seq[kh_val(hash, entry)], seq);
         }
@@ -704,7 +709,7 @@ int fa_order(int argc, char *argv[]) {
     }
 
     if (buf_seq != NULL) free(buf_seq);
-    kh_destroy(str, hash);
+    kh_destroy(str2int, hash);
     kseq_destroy(seq);
     gzclose(fp);
     if (strcmp(file_out, "stdout") != 0) {
@@ -789,8 +794,8 @@ int fa_filter(int argc, char *argv[]) {
     seq = kseq_init(fp);
 
     // variables for hashing
-    khash_t(str) *hash;  // the hash
-    hash = kh_init(str);
+    khash_t(str2int) *hash;  // the hash
+    hash = kh_init(str2int);
     int ret;  // return value from hashing
 
     while (kseq_read(seq) >= 0) {
@@ -811,7 +816,7 @@ int fa_filter(int argc, char *argv[]) {
             //     0 if the key is present in the hash table;
             //     1 if the bucket is empty (never used);
             //     2 if the element in the bucket has been deleted [int*]
-            kh_put(str, hash, strdup(seq_name), &ret);
+            kh_put(str2int, hash, strdup(seq_name), &ret);
             if (ret == 0) {
                 flag_pass = 0;
             }
