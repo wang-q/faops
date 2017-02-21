@@ -318,7 +318,7 @@ int fa_frag(int argc, char *argv[]) {
         !isdigit(argv[optind + 2][0])) {
         fprintf(stderr,
                 "\n"
-                        "faops frag - Extract a piece of DNA from a .fa file.\n"
+                        "faops frag - Extract a piece of DNA from a FA file.\n"
                         "usage:\n"
                         "    faops frag [options] <in.fa> <start> <end> <out.fa>\n"
                         "\n"
@@ -393,9 +393,10 @@ int fa_frag(int argc, char *argv[]) {
 
 int fa_rc(int argc, char *argv[]) {
     int flag_n = 0, flag_r = 0, flag_c = 0;
+    char *fn_list = "";
     int option = 0, line = 80;
 
-    while ((option = getopt(argc, argv, "nrcl:")) != -1) {
+    while ((option = getopt(argc, argv, "nrcf:l:")) != -1) {
         switch (option) {
             case 'n':
                 flag_n = 1;
@@ -405,6 +406,9 @@ int fa_rc(int argc, char *argv[]) {
                 break;
             case 'c':
                 flag_c = 1;
+                break;
+            case 'f':
+                fn_list = strdup(optarg);
                 break;
             case 'l':
                 line = atoi(optarg);
@@ -428,6 +432,7 @@ int fa_rc(int argc, char *argv[]) {
                         "    -n         keep name identical (don't prepend RC_)\n"
                         "    -r         just Reverse, prepends R_\n"
                         "    -c         just Complement, prepends C_\n"
+                        "    -f STR     only RC sequences in this list.file\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
@@ -437,30 +442,70 @@ int fa_rc(int argc, char *argv[]) {
         exit(1);
     }
 
-    char *file_in = argv[optind];
-    char *file_out = argv[optind + 1];
+    //  Read list.file to a hash table
+    khash_t(str2int) *hash;
+    hash = kh_init(str2int);
 
-    FILE *stream_in = source_in(file_in);
-    FILE *stream_out = source_out(file_out);
-    gzFile fp;
-    kseq_t *seq;
-    char seq_name[512];
+    int serial = 0; // serials in list.file
+    if (strcmp(fn_list, "") != 0) {
+        FILE *fp_list;
 
-    fp = gzdopen(fileno(stream_in), "r");
-    seq = kseq_init(fp);
+        if ((fp_list = fopen(fn_list, "r")) == NULL) {
+            fprintf(stderr, "Cannot open list file [%s]\n", fn_list);
+            exit(1);
+        }
+
+        int ret;            // return value from hashing
+        int buf_size = 4096;
+        char buf[buf_size]; // buffers for names in list.file
+        while (fscanf(fp_list, "%s\n", buf) == 1) {
+            khint_t entry = kh_put(str2int, hash, strdup(buf), &ret);
+            kh_val(hash, entry) = serial;
+            serial++;
+        }
+        fclose(fp_list);
+    }
+
+    // in and out
+    char *fn_in = argv[optind];
+    char *fn_out = argv[optind + 1];
+
+    FILE *stream_in = source_in(fn_in);
+    FILE *stream_out = source_out(fn_out);
+
+    gzFile fp = gzdopen(fileno(stream_in), "r");
+    kseq_t *seq = kseq_init(fp);
 
     while (kseq_read(seq) >= 0) {
-        sprintf(seq_name, "%s%s", prefix, seq->name.s);
-        fprintf(stream_out, ">%s\n", seq_name);
+        char seq_name[512];
+        sprintf(seq_name, "%s", seq->name.s);
+        if (strcmp(fn_list, "") != 0) {
+            if (kh_get(str2int, hash, seq_name) != kh_end(hash)) {
+                sprintf(seq_name, "%s%s", prefix, seq->name.s);
 
-        if (flag_r) {
-            reverse_str(seq->seq.s, seq->seq.l);
-        } else if (flag_c) {
-            complement_str(seq->seq.s, seq->seq.l);
+                if (flag_r) {
+                    reverse_str(seq->seq.s, seq->seq.l);
+                } else if (flag_c) {
+                    complement_str(seq->seq.s, seq->seq.l);
+                } else {
+                    reverse_str(seq->seq.s, seq->seq.l);
+                    complement_str(seq->seq.s, seq->seq.l);
+                }
+            }
         } else {
-            reverse_str(seq->seq.s, seq->seq.l);
-            complement_str(seq->seq.s, seq->seq.l);
+            sprintf(seq_name, "%s%s", prefix, seq->name.s);
+
+            if (flag_r) {
+                reverse_str(seq->seq.s, seq->seq.l);
+            } else if (flag_c) {
+                complement_str(seq->seq.s, seq->seq.l);
+            } else {
+                reverse_str(seq->seq.s, seq->seq.l);
+                complement_str(seq->seq.s, seq->seq.l);
+            }
         }
+
+        fprintf(stream_out, ">%s\n", seq_name);
 
         for (int i = 0; i < seq->seq.l; i++) {
             if (line != 0 && i != 0 && (i % line) == 0) {
@@ -473,7 +518,7 @@ int fa_rc(int argc, char *argv[]) {
 
     kseq_destroy(seq);
     gzclose(fp);
-    if (strcmp(file_out, "stdout") != 0) {
+    if (strcmp(fn_out, "stdout") != 0) {
         fclose(stream_out);
     }
     return 0;

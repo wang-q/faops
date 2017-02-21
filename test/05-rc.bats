@@ -34,3 +34,10 @@ load test_helper
         '
     assert_success
 }
+
+@test "rc: with list.file" {
+    exp=">RC_read47"
+    res=$($BATS_TEST_DIRNAME/../faops rc -l 0 -f <(echo read47) $BATS_TEST_DIRNAME/ufasta.fa stdout | grep '^>RC_')
+
+    assert_equal "$exp" "$res"
+}
