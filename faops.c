@@ -1096,7 +1096,7 @@ int fa_split_about(int argc, char *argv[]) {
     }
 
     char *file_in = argv[optind];
-    int approx_size = atoi(argv[optind + 1]);
+    long approx_size = atol(argv[optind + 1]);
     char *path_out = argv[optind + 2];
 
     FILE *stream_in = source_in(file_in);
@@ -1105,7 +1105,8 @@ int fa_split_about(int argc, char *argv[]) {
     FILE *fp_out;
     char seq_name[512];
     char file_out[1024];
-    int cur_size = 0, file_count = 0, flag_first = 1;
+    long cur_size = 0;
+    int file_count = 0, flag_first = 1;
 
 #ifdef __MINGW32__
     _mkdir(path_out);
@@ -1316,7 +1317,7 @@ int fa_n50(int argc, char *argv[]) {
     return 0;
 }
 
-char *version = "0.5.1";
+char *version = "0.5.2";
 char *message =
         "\n"
                 "Usage:     faops <command> [options] <arguments>\n"
