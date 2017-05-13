@@ -1420,7 +1420,7 @@ int fa_dazz(int argc, char *argv[]) {
     return 0;
 }
 
-char *version = "0.5.2";
+char *version = "0.6.0";
 char *message =
         "\n"
                 "Usage:     faops <command> [options] <arguments>\n"
