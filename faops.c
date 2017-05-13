@@ -908,7 +908,7 @@ int fa_filter(int argc, char *argv[]) {
                         "    -a INT     pass sequences at least this big ('a'-smallest)\n"
                         "    -z INT     pass sequences this size or smaller ('z'-biggest)\n"
                         "    -n INT     pass sequences with fewer than this number of N's\n"
-                        "    -u         Unique, removes duplicate ids, keeping the first\n"
+                        "    -u         Unique, removes duplicated ids, keeping the first\n"
                         "    -b         pretend to be a blocked fasta file\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n"
@@ -1317,6 +1317,109 @@ int fa_n50(int argc, char *argv[]) {
     return 0;
 }
 
+int fa_dazz(int argc, char *argv[]) {
+    char *prefix = "read";
+    long start_index = 1;
+    int option = 0, opt_line = 80;
+
+    while ((option = getopt(argc, argv, "p:s:l:")) != -1) {
+        switch (option) {
+            case 'p':
+                prefix = optarg;
+                break;
+            case 's':
+                start_index = atol(optarg);
+                break;
+            case 'l':
+                opt_line = atoi(optarg);
+                break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
+        }
+    }
+
+    if (optind + 2 > argc) {
+        fprintf(
+                stderr,
+                "\n"
+                        "faops dazz - Rename records for dazz_db\n"
+                        "usage:\n"
+                        "    faops dazz [options] <in.fa> <out.fa>\n"
+                        "\n"
+                        "options:\n"
+                        "    -p STR     prefix of names [read]\n"
+                        "    -s INT     start index [1]\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "out.fa == stdout means writing to stdout\n"
+                        "\n"
+                        "Sequences with duplicated ids will be dropped, keeping the first one.\n"
+                        "This command don't write a replace.tsv file, `anchr dazzname` does.\n"
+                        "\n",
+                opt_line);
+        exit(1);
+    }
+
+    char *file_in = argv[optind];
+    char *file_out = argv[optind + 1];
+
+    FILE *stream_in = source_in(file_in);
+    FILE *stream_out = source_out(file_out);
+    gzFile fp;
+    kseq_t *seq;
+    char seq_name[512];
+    int flag_pass;
+
+    fp = gzdopen(fileno(stream_in), "r");
+    seq = kseq_init(fp);
+
+    // variables for hashing
+    khash_t(str2int) *hash;  // the hash
+    hash = kh_init(str2int);
+    int ret;  // return value from hashing
+
+    long serial_no = start_index; // serial
+    while (kseq_read(seq) >= 0) {
+        sprintf(seq_name, "%s", seq->name.s);
+        flag_pass = 1;
+
+        // Extra return code:
+        //    -1 if the operation failed;
+        //     0 if the key is present in the hash table;
+        //     1 if the bucket is empty (never used);
+        //     2 if the element in the bucket has been deleted [int*]
+        kh_put(str2int, hash, strdup(seq_name), &ret);
+        if (ret == 0) {
+            flag_pass = 0;
+        }
+
+        if (flag_pass) {
+            char new_name[512];
+            sprintf(new_name, "%s/%zu/0_%zu", prefix, serial_no, seq->seq.l);
+
+            fprintf(stream_out, ">%s\n", new_name);
+            for (int i = 0; i < seq->seq.l; i++) {
+                if (opt_line != 0 && i != 0 && (i % opt_line) == 0) {
+                    fputc('\n', stream_out);
+                }
+                fputc(seq->seq.s[i], stream_out);
+            }
+            fputc('\n', stream_out);
+
+            serial_no++;
+        }
+    }
+
+    kseq_destroy(seq);
+    gzclose(fp);
+    if (strcmp(file_out, "stdout") != 0) {
+        fclose(stream_out);
+    }
+    return 0;
+}
+
 char *version = "0.5.2";
 char *message =
         "\n"
@@ -1336,6 +1439,7 @@ char *message =
                 "    split-name     splitting by sequence names\n"
                 "    split-about    splitting to chunks about specified size\n"
                 "    n50            compute N50 and other statistics\n"
+                "    dazz           rename records for dazz_db\n"
                 "\n"
                 "Options:\n"
                 "    There're no global options.\n"
@@ -1381,6 +1485,8 @@ int main(int argc, char *argv[]) {
         fa_split_about(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "n50") == 0) {
         fa_n50(argc - 1, argv + 1);
+    } else if (strcmp(argv[1], "dazz") == 0) {
+        fa_dazz(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "help") == 0) {
         return help();
     } else {
