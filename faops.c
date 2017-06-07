@@ -1442,8 +1442,6 @@ int fa_interleave(int argc, char *argv[]) {
         }
     }
 
-    fprintf(stderr, "argc %d; optind %d\n", argc, optind);
-
     if (optind + 1 > argc) {
         fprintf(
                 stderr,
@@ -1458,7 +1456,7 @@ int fa_interleave(int argc, char *argv[]) {
                         "    -s INT     start index [0]\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n"
-                        "Don't support read from stdin and write to stdout\n"
+                        "Write to stdout and don't support reading from stdin.\n"
                         "\n",
                 opt_line);
         exit(1);
