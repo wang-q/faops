@@ -1542,7 +1542,7 @@ int fa_interleave(int argc, char *argv[]) {
     return 0;
 }
 
-char *version = "0.6.0";
+char *version = "0.7.0";
 char *message =
         "\n"
                 "Usage:     faops <command> [options] <arguments>\n"
