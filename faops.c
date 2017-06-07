@@ -1420,6 +1420,128 @@ int fa_dazz(int argc, char *argv[]) {
     return 0;
 }
 
+int fa_interleave(int argc, char *argv[]) {
+    char *prefix = "read";
+    long start_index = 0;
+    int option = 0, opt_line = 0;
+
+    while ((option = getopt(argc, argv, "p:s:l:")) != -1) {
+        switch (option) {
+            case 'p':
+                prefix = optarg;
+                break;
+            case 's':
+                start_index = atol(optarg);
+                break;
+            case 'l':
+                opt_line = atoi(optarg);
+                break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
+        }
+    }
+
+    fprintf(stderr, "argc %d; optind %d\n", argc, optind);
+
+    if (optind + 1 > argc) {
+        fprintf(
+                stderr,
+                "\n"
+                        "faops interleave - Interleave two PE files\n"
+                        "                   One file is also OK, output a single N.\n"
+                        "usage:\n"
+                        "    faops interleave [options] <R1.fa> [R2.fa]\n"
+                        "\n"
+                        "options:\n"
+                        "    -p STR     prefix of names [read]\n"
+                        "    -s INT     start index [0]\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "Don't support read from stdin and write to stdout\n"
+                        "\n",
+                opt_line);
+        exit(1);
+    }
+
+    // Two files
+    if (argc - optind == 2) {
+        char *file_in1 = argv[optind];
+        char *file_in2 = argv[optind + 1];
+
+        FILE *stream_in1 = source_in(file_in1);
+        FILE *stream_in2 = source_in(file_in2);
+
+        gzFile fp1 = gzdopen(fileno(stream_in1), "r");
+        gzFile fp2 = gzdopen(fileno(stream_in2), "r");
+
+        kseq_t *seq[2];
+        seq[0] = kseq_init(fp1);
+        seq[1] = kseq_init(fp2);
+
+        char seq_name[512];
+
+        long serial_no = start_index; // serial
+        while (kseq_read(seq[0]) >= 0) {
+            if (kseq_read(seq[1]) < 0) {
+                fprintf(stderr, "[%s] R2 has fewer records.\n", __func__);
+                break;
+            }
+
+            // R1
+            sprintf(seq_name, "%s%zu", prefix, serial_no);
+            fprintf(stdout, ">%s\n", seq_name);
+            fprintf(stdout, "%s\n", seq[0]->seq.s);
+            serial_no++;
+
+            // R2
+            sprintf(seq_name, "%s%zu", prefix, serial_no);
+            fprintf(stdout, ">%s\n", seq_name);
+            fprintf(stdout, "%s\n", seq[1]->seq.s);
+            serial_no++;
+        }
+        if (kseq_read(seq[1]) >= 0) {
+            fprintf(stderr, "[%s] R1 has fewer records.\n", __func__);
+        }
+
+        kseq_destroy(seq[0]);
+        gzclose(fp1);
+        kseq_destroy(seq[1]);
+        gzclose(fp2);
+    } else {
+        char *file_in = argv[optind];
+
+        FILE *stream_in = source_in(file_in);
+        gzFile fp;
+        fp = gzdopen(fileno(stream_in), "r");
+
+        kseq_t *seq;
+        seq = kseq_init(fp);
+
+        char seq_name[512];
+
+        long serial_no = start_index; // serial
+        while (kseq_read(seq) >= 0) {
+            // R1
+            sprintf(seq_name, "%s%zu", prefix, serial_no);
+            fprintf(stdout, ">%s\n", seq_name);
+            fprintf(stdout, "%s\n", seq->seq.s);
+            serial_no++;
+
+            // R2
+            sprintf(seq_name, "%s%zu", prefix, serial_no);
+            fprintf(stdout, ">%s\n", seq_name);
+            fprintf(stdout, "N\n");
+            serial_no++;
+        }
+
+        kseq_destroy(seq);
+        gzclose(fp);
+    }
+
+    return 0;
+}
+
 char *version = "0.6.0";
 char *message =
         "\n"
@@ -1440,6 +1562,7 @@ char *message =
                 "    split-about    splitting to chunks about specified size\n"
                 "    n50            compute N50 and other statistics\n"
                 "    dazz           rename records for dazz_db\n"
+                "    interleave     interleave two PE files\n"
                 "\n"
                 "Options:\n"
                 "    There're no global options.\n"
@@ -1487,6 +1610,8 @@ int main(int argc, char *argv[]) {
         fa_n50(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "dazz") == 0) {
         fa_dazz(argc - 1, argv + 1);
+    } else if (strcmp(argv[1], "interleave") == 0) {
+        fa_interleave(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "help") == 0) {
         return help();
     } else {

@@ -17,5 +17,5 @@ load test_helper
 @test "help: lines of contents" {
     run $BATS_TEST_DIRNAME/../faops help
     run bash -c "echo \"${output}\" | wc -l | xargs echo "
-    assert_equal "23" "${output}"
+    assert_equal "24" "${output}"
 }
