@@ -630,7 +630,7 @@ int fa_some(int argc, char *argv[]) {
     return 0;
 }
 
-static void cpy_kstr(kstring_t *dst, const kstring_t *src) {
+static void copy_kstr(kstring_t *dst, const kstring_t *src) {
     if (src->l == 0) return;
     if (src->l + 1 > dst->m) {
         dst->m = src->l + 1;
@@ -641,11 +641,11 @@ static void cpy_kstr(kstring_t *dst, const kstring_t *src) {
     memcpy(dst->s, src->s, src->l + 1);
 }
 
-static void cpy_kseq(kseq_t *dst, const kseq_t *src) {
-    cpy_kstr(&dst->name, &src->name);
-    cpy_kstr(&dst->seq, &src->seq);
-    cpy_kstr(&dst->qual, &src->qual);
-    cpy_kstr(&dst->comment, &src->comment);
+static void copy_kseq(kseq_t *dst, const kseq_t *src) {
+    copy_kstr(&dst->name, &src->name);
+    copy_kstr(&dst->seq, &src->seq);
+    copy_kstr(&dst->qual, &src->qual);
+    copy_kstr(&dst->comment, &src->comment);
 }
 
 int fa_order(int argc, char *argv[]) {
@@ -732,7 +732,7 @@ int fa_order(int argc, char *argv[]) {
 
         entry = kh_get(str2int, hash, seq_name);
         if (entry != kh_end(hash)) {
-            cpy_kseq(&buf_seq[kh_val(hash, entry)], seq);
+            copy_kseq(&buf_seq[kh_val(hash, entry)], seq);
         }
     }
 
