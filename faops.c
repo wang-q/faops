@@ -219,16 +219,12 @@ int fa_count(int argc, char *argv[]) {
     unsigned long total_length = 0;
     unsigned long total_base_count[5] = {0};
 
-    gzFile fp;
-    kseq_t *seq;
-
     printf("#seq\tlen\tA\tC\tG\tT\tN");
     printf("\n");
 
     for (int f = 1; f < argc; ++f) {
-        FILE *stream_in = source_in(argv[f]);
-        fp = gzdopen(fileno(stream_in), "r");
-        seq = kseq_init(fp);
+        gzFile fp = gzdopen(fileno(source_in(argv[f])), "r");
+        kseq_t *seq = kseq_init(fp);
 
         while (kseq_read(seq) >= 0) {
             unsigned long length = 0;
@@ -280,13 +276,9 @@ int fa_size(int argc, char *argv[]) {
         exit(1);
     }
 
-    gzFile fp;
-    kseq_t *seq;
-
     for (int f = 1; f < argc; ++f) {
-        FILE *stream_in = source_in(argv[f]);
-        fp = gzdopen(fileno(stream_in), "r");
-        seq = kseq_init(fp);
+        gzFile fp = gzdopen(fileno(source_in(argv[f])), "r");
+        kseq_t *seq = kseq_init(fp);
 
         while (kseq_read(seq) >= 0) {
             printf("%s\t%lu", seq->name.s, seq->seq.l);
@@ -342,15 +334,12 @@ int fa_frag(int argc, char *argv[]) {
         exit(1);
     }
 
-    FILE *stream_in = source_in(file_in);
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
+
     FILE *stream_out = source_out(file_out);
-    gzFile fp;
-    kseq_t *seq;
     char seq_name[512];
     int is_first = 1;
-
-    fp = gzdopen(fileno(stream_in), "r");
-    seq = kseq_init(fp);
 
     while (kseq_read(seq) >= 0) {
         if (!is_first) {
@@ -470,11 +459,10 @@ int fa_rc(int argc, char *argv[]) {
     char *fn_in = argv[optind];
     char *fn_out = argv[optind + 1];
 
-    FILE *stream_in = source_in(fn_in);
-    FILE *stream_out = source_out(fn_out);
-
-    gzFile fp = gzdopen(fileno(stream_in), "r");
+    gzFile fp = gzdopen(fileno(source_in(fn_in)), "r");
     kseq_t *seq = kseq_init(fp);
+
+    FILE *stream_out = source_out(fn_out);
 
     while (kseq_read(seq) >= 0) {
         char seq_name[512];
@@ -564,15 +552,12 @@ int fa_some(int argc, char *argv[]) {
     char *file_list = argv[optind + 1];
     char *file_out = argv[optind + 2];
 
-    FILE *stream_in = source_in(file_in);
-    FILE *stream_out = source_out(file_out);
-    gzFile fp;
-    kseq_t *seq;
-    FILE *fp_list;
-    char seq_name[512];
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
 
-    fp = gzdopen(fileno(stream_in), "r");
-    seq = kseq_init(fp);
+    FILE *stream_out = source_out(file_out);
+
+    char seq_name[512];
 
     // variables for hashing
     // from Heng Li's replay to http://www.biostars.org/p/10353/
@@ -584,6 +569,8 @@ int fa_some(int argc, char *argv[]) {
     //  Read list.file to a hash table
     int serial = 0;// serials in list.file
     {
+        FILE *fp_list;
+
         if ((fp_list = fopen(file_list, "r")) == NULL) {
             fprintf(stderr, "Cannot open list file [%s]\n", file_list);
             exit(1);
@@ -684,13 +671,10 @@ int fa_order(int argc, char *argv[]) {
     char *file_list = argv[optind + 1];
     char *file_out = argv[optind + 2];
 
-    FILE *stream_in = source_in(file_in);
-    FILE *stream_out = source_out(file_out);
-    gzFile fp;
-    kseq_t *seq;
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
 
-    fp = gzdopen(fileno(stream_in), "r");
-    seq = kseq_init(fp);
+    FILE *stream_out = source_out(file_out);
 
     // variables for hashing
     // from Heng Li's replay to http://www.biostars.org/p/10353/
@@ -801,20 +785,18 @@ int fa_replace(int argc, char *argv[]) {
     char *file_list = argv[optind + 1];
     char *file_out = argv[optind + 2];
 
-    FILE *stream_in = source_in(file_in);
-    FILE *stream_out = source_out(file_out);
-    gzFile fp;
-    kseq_t *seq;
-    FILE *fp_list;
-    char seq_name[512];
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
 
-    fp = gzdopen(fileno(stream_in), "r");
-    seq = kseq_init(fp);
+    FILE *stream_out = source_out(file_out);
+    char seq_name[512];
 
     //  Read replace.tsv to a hash table
     khash_t(str2str) *hash;
     hash = kh_init(str2str);
     {
+        FILE *fp_list;
+
         if ((fp_list = fopen(file_list, "r")) == NULL) {
             fprintf(stderr, "Cannot open list file [%s]\n", file_list);
             exit(1);
@@ -925,15 +907,12 @@ int fa_filter(int argc, char *argv[]) {
     char *file_in = argv[optind];
     char *file_out = argv[optind + 1];
 
-    FILE *stream_in = source_in(file_in);
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
+
     FILE *stream_out = source_out(file_out);
-    gzFile fp;
-    kseq_t *seq;
     char seq_name[512];
     int flag_pass;
-
-    fp = gzdopen(fileno(stream_in), "r");
-    seq = kseq_init(fp);
 
     // variables for hashing
     khash_t(str2int) *hash;  // the hash
@@ -1022,9 +1001,9 @@ int fa_split_name(int argc, char *argv[]) {
     char *file_in = argv[optind];
     char *path_out = argv[optind + 1];
 
-    FILE *stream_in = source_in(file_in);
-    gzFile fp;
-    kseq_t *seq;
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
+
     FILE *fp_out;
     char seq_name[512];
     char file_out[1024];
@@ -1034,9 +1013,6 @@ int fa_split_name(int argc, char *argv[]) {
 #else
     mkdir(path_out, 0777);
 #endif
-
-    fp = gzdopen(fileno(stream_in), "r");
-    seq = kseq_init(fp);
 
     while (kseq_read(seq) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
@@ -1099,9 +1075,9 @@ int fa_split_about(int argc, char *argv[]) {
     long approx_size = atol(argv[optind + 1]);
     char *path_out = argv[optind + 2];
 
-    FILE *stream_in = source_in(file_in);
-    gzFile fp;
-    kseq_t *seq;
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
+
     FILE *fp_out;
     char seq_name[512];
     char file_out[1024];
@@ -1113,9 +1089,6 @@ int fa_split_about(int argc, char *argv[]) {
 #else
     mkdir(path_out, 0777);
 #endif
-
-    fp = gzdopen(fileno(stream_in), "r");
-    seq = kseq_init(fp);
 
     while (kseq_read(seq) >= 0) {
         if (cur_size == 0) {
@@ -1365,15 +1338,12 @@ int fa_dazz(int argc, char *argv[]) {
     char *file_in = argv[optind];
     char *file_out = argv[optind + 1];
 
-    FILE *stream_in = source_in(file_in);
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
+
     FILE *stream_out = source_out(file_out);
-    gzFile fp;
-    kseq_t *seq;
     char seq_name[512];
     int flag_pass;
-
-    fp = gzdopen(fileno(stream_in), "r");
-    seq = kseq_init(fp);
 
     // variables for hashing
     khash_t(str2int) *hash;  // the hash
@@ -1467,11 +1437,8 @@ int fa_interleave(int argc, char *argv[]) {
         char *file_in1 = argv[optind];
         char *file_in2 = argv[optind + 1];
 
-        FILE *stream_in1 = source_in(file_in1);
-        FILE *stream_in2 = source_in(file_in2);
-
-        gzFile fp1 = gzdopen(fileno(stream_in1), "r");
-        gzFile fp2 = gzdopen(fileno(stream_in2), "r");
+        gzFile fp1 = gzdopen(fileno(source_in(file_in1)), "r");
+        gzFile fp2 = gzdopen(fileno(source_in(file_in2)), "r");
 
         kseq_t *seq[2];
         seq[0] = kseq_init(fp1);
@@ -1509,12 +1476,8 @@ int fa_interleave(int argc, char *argv[]) {
     } else {
         char *file_in = argv[optind];
 
-        FILE *stream_in = source_in(file_in);
-        gzFile fp;
-        fp = gzdopen(fileno(stream_in), "r");
-
-        kseq_t *seq;
-        seq = kseq_init(fp);
+        gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+        kseq_t *seq = kseq_init(fp);
 
         char seq_name[512];
 
