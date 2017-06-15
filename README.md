@@ -26,7 +26,7 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 $ ./faops help
 
 Usage:     faops <command> [options] <arguments>
-Version:   0.7.1
+Version:   0.8.0
 
 Commands:
     help           print this message
@@ -41,11 +41,15 @@ Commands:
     split-name     splitting by sequence names
     split-about    splitting to chunks about specified size
     n50            compute N50 and other statistics
+    dazz           rename records for dazz_db
+    interleave     interleave two PE files
+    region         extract regions from a FA file
 
 Options:
     There're no global options.
     Type "faops command-name" for detailed options of each command.
     Options *MUST* be placed just after command.
+
 ```
 
 ## Examples
