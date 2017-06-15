@@ -1503,6 +1503,112 @@ int fa_interleave(int argc, char *argv[]) {
     return 0;
 }
 
+int fa_region(int argc, char *argv[]) {
+    int option = 0, line = 80;
+
+    while ((option = getopt(argc, argv, "l:")) != -1) {
+        switch (option) {
+            case 'l':
+                line = atoi(optarg);
+                break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
+        }
+    }
+
+    if (optind + 3 > argc) {
+        fprintf(stderr,
+                "\n"
+                        "faops region - Extract regions from a FA file\n"
+                        "usage:\n"
+                        "    faops region [options] <in.fa> <region.txt> <out.fa>\n"
+                        "\n"
+                        "options:\n"
+                        "    -l INT     sequence line length [%d]\n"
+                        "\n"
+                        "<region.txt> is a text file containing one field\n"
+                        "    seq_name:begin-end\n"
+                        "\n"
+                        "Doesn't support multiple regions in one sequence.\n"
+                        "\n"
+                        "in.fa  == stdin  means reading from stdin\n"
+                        "out.fa == stdout means writing to stdout\n"
+                        "\n",
+                line);
+        exit(1);
+    }
+
+    char *file_in = argv[optind];
+    char *file_list = argv[optind + 1];
+    char *file_out = argv[optind + 2];
+
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
+
+    FILE *stream_out = source_out(file_out);
+    char seq_name[512];
+
+    //  Read region.txt to two hash tables
+    khash_t(str2int) *hash_begin;
+    khash_t(str2int) *hash_end;
+    hash_begin = kh_init(str2int);
+    hash_end = kh_init(str2int);
+    {
+        FILE *fp_list;
+
+        if ((fp_list = fopen(file_list, "r")) == NULL) {
+            fprintf(stderr, "Cannot open list file [%s]\n", file_list);
+            exit(1);
+        }
+
+        int ret;            // return value from hashing
+        int buf_size = 4096;
+        char buf[buf_size]; // buffers for seq_name in region.txt
+        int begin, end;
+        while (fscanf(fp_list, "%[^:]:%d-%d\n", buf, &begin, &end) == 3) {
+            khint_t entry_begin = kh_put(str2int, hash_begin, strdup(buf), &ret);
+            kh_val(hash_begin, entry_begin) = begin;
+
+            khint_t entry_end = kh_put(str2int, hash_end, strdup(buf), &ret);
+            kh_val(hash_end, entry_end) = end;
+
+            fprintf(stderr, "Key: [%s];\tValue:[%d]\tValue:[%d]\n", kh_key(hash_begin, entry_begin),
+                    kh_val(hash_begin, entry_begin), kh_val(hash_end, entry_end));
+        }
+        fclose(fp_list);
+    }
+
+    while (kseq_read(seq) >= 0) {
+        sprintf(seq_name, "%s", seq->name.s);
+
+        khint_t entry_begin = kh_get(str2int, hash_begin, seq_name);
+        khint_t entry_end = kh_get(str2int, hash_end, seq_name);
+        if (entry_begin != kh_end(hash_begin) && entry_end != kh_end(hash_end)) {
+            int begin = kh_val(hash_begin, entry_begin);
+            int end = kh_val(hash_end, entry_end);
+            fprintf(stream_out, ">%s:%d-%d\n", seq_name, begin, end);
+
+            for (int i = begin - 1; i < end; i++) {
+                if (line != 0 && i != 0 && (i % line) == 0) {
+                    fputc('\n', stream_out);
+                }
+                fputc(seq->seq.s[i], stream_out);
+            }
+            fputc('\n', stream_out);
+        }
+    }
+
+    kh_destroy(str2int, hash_begin);
+    kh_destroy(str2int, hash_end);
+    kseq_destroy(seq);
+    gzclose(fp);
+    if (strcmp(file_out, "stdout") != 0) {
+        fclose(stream_out);
+    }
+    return 0;
+}
+
 char *version = "0.7.1";
 char *message =
         "\n"
@@ -1524,6 +1630,7 @@ char *message =
                 "    n50            compute N50 and other statistics\n"
                 "    dazz           rename records for dazz_db\n"
                 "    interleave     interleave two PE files\n"
+                "    region         extract regions from a FA file\n"
                 "\n"
                 "Options:\n"
                 "    There're no global options.\n"
@@ -1573,6 +1680,8 @@ int main(int argc, char *argv[]) {
         fa_dazz(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "interleave") == 0) {
         fa_interleave(argc - 1, argv + 1);
+    } else if (strcmp(argv[1], "region") == 0) {
+        fa_region(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "help") == 0) {
         return help();
     } else {
