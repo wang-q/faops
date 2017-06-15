@@ -149,9 +149,9 @@ void complement_str(char *str, long length) {
 }
 
 // for qsort
-static int compare_ints_desc(const void *a, const void *b) {
-    int arg1 = *(const int *) a;
-    int arg2 = *(const int *) b;
+static int compare_long_desc(const void *a, const void *b) {
+    long arg1 = *(const long *) a;
+    long arg2 = *(const long *) b;
 
     if (arg1 < arg2) return 1;
     if (arg1 > arg2) return -1;
@@ -1192,9 +1192,9 @@ int fa_n50(int argc, char *argv[]) {
     gzFile fp;
     kseq_t *seq;
 
-    int capacity = 1024;
-    int *lengths = (int *) malloc(capacity * sizeof(int)); // store lengths of sequences
-    int count = 0; // number of sequences
+    long capacity = 1024;
+    long *lengths = (long *) malloc(capacity * sizeof(long)); // store lengths of sequences
+    long count = 0; // number of sequences
     long total_size = 0;
 
     for (int f = optind; f < argc; ++f) {
@@ -1208,10 +1208,10 @@ int fa_n50(int argc, char *argv[]) {
             // increase capacity on necessary
             if (count > capacity - 1) {
                 capacity = capacity * 2;
-                lengths = (int *) realloc(lengths, capacity * sizeof(int));
+                lengths = (long *) realloc(lengths, capacity * sizeof(long));
             }
 
-            lengths[count] = (int) seq->seq.l;
+            lengths[count] = (long) seq->seq.l;
             count++;
         }
 
@@ -1219,21 +1219,21 @@ int fa_n50(int argc, char *argv[]) {
         gzclose(fp);
     }
 
-    qsort(lengths, (size_t) count, sizeof(int), compare_ints_desc);
+    qsort(lengths, (size_t) count, sizeof(long), compare_long_desc);
 
-    int goal; // reach n_given% of total_size or genome_size
+    long goal; // reach n_given% of total_size or genome_size
     if (genome_size > 0) {
-        goal = (int) (((double) n_given) * ((double) genome_size) / 100.0);
+        goal = (long) (((double) n_given) * ((double) genome_size) / 100.0);
     } else {
-        goal = (int) (((double) n_given) * ((double) total_size) / 100.0);
+        goal = (long) (((double) n_given) * ((double) total_size) / 100.0);
     }
 
     long cumulative_size = 0;
     double e_size = 0.0; // GAGE E-size
-    int nx_size = 0; // N50 or Nx
+    long nx_size = 0; // N50 or Nx
 
-    for (int i = 0; i < count; ++i) {
-        int cur_size = lengths[i];
+    for (long i = 0; i < count; ++i) {
+        long cur_size = lengths[i];
 
         long prev_cumulative_size = cumulative_size;
         cumulative_size += cur_size;
@@ -1251,7 +1251,7 @@ int fa_n50(int argc, char *argv[]) {
         if (!flag_no_header) {
             printf("N%d\t", n_given);
         }
-        printf("%d\n", nx_size);
+        printf("%li\n", nx_size);
     }
 
     // print sum
@@ -1284,7 +1284,7 @@ int fa_n50(int argc, char *argv[]) {
         if (!flag_no_header) {
             printf("C\t");
         }
-        printf("%d\n", count);
+        printf("%li\n", count);
     }
 
     return 0;
