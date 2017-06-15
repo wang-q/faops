@@ -1573,8 +1573,8 @@ int fa_region(int argc, char *argv[]) {
             khint_t entry_end = kh_put(str2int, hash_end, strdup(buf), &ret);
             kh_val(hash_end, entry_end) = end;
 
-            fprintf(stderr, "Key: [%s];\tValue:[%d]\tValue:[%d]\n", kh_key(hash_begin, entry_begin),
-                    kh_val(hash_begin, entry_begin), kh_val(hash_end, entry_end));
+//            fprintf(stderr, "Key: [%s];\tValue:[%d]\tValue:[%d]\n", kh_key(hash_begin, entry_begin),
+//                    kh_val(hash_begin, entry_begin), kh_val(hash_end, entry_end));
         }
         fclose(fp_list);
     }
@@ -1609,7 +1609,7 @@ int fa_region(int argc, char *argv[]) {
     return 0;
 }
 
-char *version = "0.8.0";
+char *version = "0.8.1";
 char *message =
         "\n"
                 "Usage:     faops <command> [options] <arguments>\n"
