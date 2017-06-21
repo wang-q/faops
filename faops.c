@@ -329,8 +329,8 @@ int fa_frag(int argc, char *argv[]) {
     int end = atoi(argv[optind + 2]);
     char *file_out = argv[optind + 3];
 
-    if (start >= end) {
-        fprintf(stderr, "start [%d] >= end [%d]\n", start, end);
+    if (start > end) {
+        fprintf(stderr, "start [%d] > end [%d]\n", start, end);
         exit(1);
     }
 
@@ -349,16 +349,16 @@ int fa_frag(int argc, char *argv[]) {
         }
 
         if (end > seq->seq.l) {
-            fprintf(stderr, "%s only has %zu bases, truncating\n", seq->name.s,
+            fprintf(stderr, "%s only has %zu bases\n", seq->name.s,
                     seq->seq.l);
-            end = (int) seq->seq.l;
-            if (start >= end) {
-                fprintf(stderr, "Sorry, no sequence left after truncating\n");
-                exit(1);
-            }
+            exit(1);
         }
 
-        sprintf(seq_name, "%s:%d-%d", seq->name.s, start, end);
+        if (start < end) {
+            sprintf(seq_name, "%s:%d-%d", seq->name.s, start, end);
+        } else {
+            sprintf(seq_name, "%s:%d", seq->name.s, start);
+        }
         fprintf(stream_out, ">%s\n", seq_name);
 
         for (int i = 0; i < end - start + 1; i++) {
