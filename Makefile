@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -Wall -O2 -g -std=c99 -Wno-unused-function
+CFLAGS=-c -Wall -O2 -g -std=gnu99 -Wno-unused-function
 #recommended options: -ffast-math -ftree-vectorize -march=core2 -mssse3 -O3
 COPTS=
 LDFLAGS= -L. -lz

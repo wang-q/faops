@@ -13,3 +13,9 @@ load test_helper
     res=$($BATS_TEST_DIRNAME/../faops region -l 0 $BATS_TEST_DIRNAME/ufasta.fa <(echo read0:1-10) stdout)
     assert_equal "${exp}" "${res}"
 }
+
+@test "region: 1 base" {
+    exp=$($BATS_TEST_DIRNAME/../faops frag $BATS_TEST_DIRNAME/ufasta.fa 1 1 stdout)
+    res=$($BATS_TEST_DIRNAME/../faops region -l 0 $BATS_TEST_DIRNAME/ufasta.fa <(echo read0:1) stdout)
+    assert_equal "${exp}" "${res}"
+}

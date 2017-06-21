@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1562,20 +1564,32 @@ int fa_region(int argc, char *argv[]) {
             exit(1);
         }
 
-        int ret;            // return value from hashing
-        int buf_size = 4096;
-        char buf[buf_size]; // buffers for seq_name in region.txt
-        int begin, end;
-        while (fscanf(fp_list, "%[^:]:%d-%d\n", buf, &begin, &end) == 3) {
-            khint_t entry_begin = kh_put(str2int, hash_begin, strdup(buf), &ret);
-            kh_val(hash_begin, entry_begin) = begin;
+        char *lineptr = NULL;
+        size_t len = 0;
 
-            khint_t entry_end = kh_put(str2int, hash_end, strdup(buf), &ret);
-            kh_val(hash_end, entry_end) = end;
+        while (getline(&lineptr, &len, fp_list) != -1) {
+            int ret;            // return value from hashing
+            char buf[4096]; // buffers for seq_name in region.txt
+            int begin, end;
+            if (sscanf(lineptr, "%[^:]:%d-%d\n", buf, &begin, &end) == 3) {
+                khint_t entry_begin = kh_put(str2int, hash_begin, strdup(buf), &ret);
+                kh_val(hash_begin, entry_begin) = begin;
+
+                khint_t entry_end = kh_put(str2int, hash_end, strdup(buf), &ret);
+                kh_val(hash_end, entry_end) = end;
 
 //            fprintf(stderr, "Key: [%s];\tValue:[%d]\tValue:[%d]\n", kh_key(hash_begin, entry_begin),
 //                    kh_val(hash_begin, entry_begin), kh_val(hash_end, entry_end));
+            } else if (sscanf(lineptr, "%[^:]:%d\n", buf, &begin) == 2) {
+                khint_t entry_begin = kh_put(str2int, hash_begin, strdup(buf), &ret);
+                kh_val(hash_begin, entry_begin) = begin;
+
+                khint_t entry_end = kh_put(str2int, hash_end, strdup(buf), &ret);
+                kh_val(hash_end, entry_end) = begin;
+            }
         }
+
+        free(lineptr);
         fclose(fp_list);
     }
 
@@ -1587,7 +1601,12 @@ int fa_region(int argc, char *argv[]) {
         if (entry_begin != kh_end(hash_begin) && entry_end != kh_end(hash_end)) {
             int begin = kh_val(hash_begin, entry_begin);
             int end = kh_val(hash_end, entry_end);
-            fprintf(stream_out, ">%s:%d-%d\n", seq_name, begin, end);
+
+            if (begin < end) {
+                fprintf(stream_out, ">%s:%d-%d\n", seq_name, begin, end);
+            } else {
+                fprintf(stream_out, ">%s:%d\n", seq_name, begin);
+            }
 
             for (int i = begin - 1; i < end; i++) {
                 if (line != 0 && i != 0 && (i % line) == 0) {
