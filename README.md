@@ -26,7 +26,7 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 $ ./faops help
 
 Usage:     faops <command> [options] <arguments>
-Version:   0.8.2
+Version:   0.8.3
 
 Commands:
     help           print this message
