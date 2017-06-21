@@ -1295,15 +1295,19 @@ int fa_n50(int argc, char *argv[]) {
 int fa_dazz(int argc, char *argv[]) {
     char *prefix = "read";
     long start_index = 1;
+    int flag_all = 0;
     int option = 0, opt_line = 80;
 
-    while ((option = getopt(argc, argv, "p:s:l:")) != -1) {
+    while ((option = getopt(argc, argv, "p:s:al:")) != -1) {
         switch (option) {
             case 'p':
                 prefix = optarg;
                 break;
             case 's':
                 start_index = atol(optarg);
+                break;
+            case 'a':
+                flag_all = 1;
                 break;
             case 'l':
                 opt_line = atoi(optarg);
@@ -1325,6 +1329,7 @@ int fa_dazz(int argc, char *argv[]) {
                         "options:\n"
                         "    -p STR     prefix of names [read]\n"
                         "    -s INT     start index [1]\n"
+                        "    -a         don't drop duplicated ids\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
@@ -1357,14 +1362,16 @@ int fa_dazz(int argc, char *argv[]) {
         sprintf(seq_name, "%s", seq->name.s);
         flag_pass = 1;
 
-        // Extra return code:
-        //    -1 if the operation failed;
-        //     0 if the key is present in the hash table;
-        //     1 if the bucket is empty (never used);
-        //     2 if the element in the bucket has been deleted [int*]
-        kh_put(str2int, hash, strdup(seq_name), &ret);
-        if (ret == 0) {
-            flag_pass = 0;
+        if (!flag_all) {
+            // Extra return code:
+            //    -1 if the operation failed;
+            //     0 if the key is present in the hash table;
+            //     1 if the bucket is empty (never used);
+            //     2 if the element in the bucket has been deleted [int*]
+            kh_put(str2int, hash, strdup(seq_name), &ret);
+            if (ret == 0) {
+                flag_pass = 0;
+            }
         }
 
         if (flag_pass) {
