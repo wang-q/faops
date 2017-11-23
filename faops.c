@@ -1044,10 +1044,14 @@ int fa_split_name(int argc, char *argv[]) {
 }
 
 int fa_split_about(int argc, char *argv[]) {
+    int max_parts = 0;
     int option = 0, line = 80;
 
-    while ((option = getopt(argc, argv, "l:")) != -1) {
+    while ((option = getopt(argc, argv, "l:m:")) != -1) {
         switch (option) {
+            case 'm':
+                max_parts = atoi(optarg);
+                break;
             case 'l':
                 line = atoi(optarg);
                 break;
@@ -1067,6 +1071,7 @@ int fa_split_about(int argc, char *argv[]) {
                         "    faops split-about [options] <in.fa> <approx_size> <outdir>\n"
                         "\n"
                         "options:\n"
+                        "    -m INT     max parts\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n",
                 line);
@@ -1102,6 +1107,12 @@ int fa_split_about(int argc, char *argv[]) {
 
             sprintf(file_out, "%s/%03d.fa", path_out, file_count);
             file_count++;
+
+            if (max_parts > 0 && file_count > max_parts) {
+                kseq_destroy(seq);
+                gzclose(fp);
+                return 0;
+            }
 
             if ((fp_out = fopen(file_out, "w")) == NULL) {
                 fprintf(stderr, "Can't open output file [%s]\n", file_out);
