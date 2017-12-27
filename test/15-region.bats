@@ -15,7 +15,13 @@ load test_helper
 }
 
 @test "region: 1 base" {
-    exp=$($BATS_TEST_DIRNAME/../faops frag $BATS_TEST_DIRNAME/ufasta.fa 1 1 stdout)
-    res=$($BATS_TEST_DIRNAME/../faops region -l 0 $BATS_TEST_DIRNAME/ufasta.fa <(echo read0:1) stdout)
+    exp=$($BATS_TEST_DIRNAME/../faops frag $BATS_TEST_DIRNAME/ufasta.fa 10 10 stdout)
+    res=$($BATS_TEST_DIRNAME/../faops region -l 0 $BATS_TEST_DIRNAME/ufasta.fa <(echo read0:10) stdout)
+    assert_equal "${exp}" "${res}"
+}
+
+@test "region: regions" {
+    exp=4
+    res=$($BATS_TEST_DIRNAME/../faops region -l 0 $BATS_TEST_DIRNAME/ufasta.fa <(echo read1:1-10,50-60) stdout | wc -l | xargs echo)
     assert_equal "${exp}" "${res}"
 }

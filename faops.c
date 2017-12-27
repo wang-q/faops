@@ -1548,9 +1548,7 @@ int fa_region(int argc, char *argv[]) {
                         "    -l INT     sequence line length [%d]\n"
                         "\n"
                         "<region.txt> is a text file containing one field\n"
-                        "    seq_name:begin-end\n"
-                        "\n"
-                        "Doesn't support multiple regions in one sequence.\n"
+                        "    seq_name:begin-end[,begin-end]\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
                         "out.fa == stdout means writing to stdout\n"
@@ -1569,11 +1567,9 @@ int fa_region(int argc, char *argv[]) {
     FILE *stream_out = source_out(file_out);
     char seq_name[512];
 
-    //  Read region.txt to two hash tables
-    khash_t(str2int) *hash_begin;
-    khash_t(str2int) *hash_end;
-    hash_begin = kh_init(str2int);
-    hash_end = kh_init(str2int);
+    //  Read region.txt to hash table
+    khash_t(str2str) *hash;
+    hash = kh_init(str2str);
     {
         FILE *fp_list;
 
@@ -1587,23 +1583,11 @@ int fa_region(int argc, char *argv[]) {
 
         while (getline(&lineptr, &len, fp_list) != -1) {
             int ret;            // return value from hashing
-            char buf[4096]; // buffers for seq_name in region.txt
-            int begin, end;
-            if (sscanf(lineptr, "%[^:]:%d-%d\n", buf, &begin, &end) == 3) {
-                khint_t entry_begin = kh_put(str2int, hash_begin, strdup(buf), &ret);
-                kh_val(hash_begin, entry_begin) = begin;
-
-                khint_t entry_end = kh_put(str2int, hash_end, strdup(buf), &ret);
-                kh_val(hash_end, entry_end) = end;
-
-//            fprintf(stderr, "Key: [%s];\tValue:[%d]\tValue:[%d]\n", kh_key(hash_begin, entry_begin),
-//                    kh_val(hash_begin, entry_begin), kh_val(hash_end, entry_end));
-            } else if (sscanf(lineptr, "%[^:]:%d\n", buf, &begin) == 2) {
-                khint_t entry_begin = kh_put(str2int, hash_begin, strdup(buf), &ret);
-                kh_val(hash_begin, entry_begin) = begin;
-
-                khint_t entry_end = kh_put(str2int, hash_end, strdup(buf), &ret);
-                kh_val(hash_end, entry_end) = begin;
+            char buf1[4096];    // buffers for seq_name in region.txt
+            char buf2[65536];   // buffers for runlist in region.txt
+            if (sscanf(lineptr, "%[^:]:%[0-9,-]\n", buf1, buf2) == 2) {
+                khint_t entry = kh_put(str2str, hash, strdup(buf1), &ret);
+                kh_val(hash, entry) = strdup(buf2);
             }
         }
 
@@ -1614,30 +1598,45 @@ int fa_region(int argc, char *argv[]) {
     while (kseq_read(seq) >= 0) {
         sprintf(seq_name, "%s", seq->name.s);
 
-        khint_t entry_begin = kh_get(str2int, hash_begin, seq_name);
-        khint_t entry_end = kh_get(str2int, hash_end, seq_name);
-        if (entry_begin != kh_end(hash_begin) && entry_end != kh_end(hash_end)) {
-            int begin = kh_val(hash_begin, entry_begin);
-            int end = kh_val(hash_end, entry_end);
+        khint_t entry = kh_get(str2str, hash, seq_name);
+        if (entry != kh_end(hash)) {
+            char *runlist = kh_val(hash, entry);
 
-            if (begin < end) {
-                fprintf(stream_out, ">%s:%d-%d\n", seq_name, begin, end);
-            } else {
-                fprintf(stream_out, ">%s:%d\n", seq_name, begin);
+            if (strcmp("-", runlist) == 0) {
+                continue;
             }
 
-            for (int i = begin - 1; i < end; i++) {
-                if (line != 0 && i != 0 && (i % line) == 0) {
-                    fputc('\n', stream_out);
+            char str[strlen(runlist) + 1], *token;
+            strcpy(str, runlist);
+            for (token = strtok(str, ",");
+                 token != NULL;
+                 token = strtok(NULL, ",")
+                    ) {
+                int begin, end;
+
+                int number = sscanf(token, "%d-%d", &begin, &end);
+                if (number == 1) {
+                    end = begin;
                 }
-                fputc(seq->seq.s[i], stream_out);
+
+                if (begin < end) {
+                    fprintf(stream_out, ">%s:%d-%d\n", seq_name, begin, end);
+                } else {
+                    fprintf(stream_out, ">%s:%d\n", seq_name, begin);
+                }
+
+                for (int i = begin - 1; i < end; i++) {
+                    if (line != 0 && i != 0 && (i % line) == 0) {
+                        fputc('\n', stream_out);
+                    }
+                    fputc(seq->seq.s[i], stream_out);
+                }
+                fputc('\n', stream_out);
             }
-            fputc('\n', stream_out);
         }
     }
 
-    kh_destroy(str2int, hash_begin);
-    kh_destroy(str2int, hash_end);
+    kh_destroy(str2str, hash);
     kseq_destroy(seq);
     gzclose(fp);
     if (strcmp(file_out, "stdout") != 0) {
