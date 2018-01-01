@@ -1475,14 +1475,14 @@ int fa_interleave(int argc, char *argv[]) {
 
             // R1
             sprintf(seq_name, "%s%zu", prefix, serial_no);
-            fprintf(stdout, ">%s\n", seq_name);
+            fprintf(stdout, ">%s/1\n", seq_name);
             fprintf(stdout, "%s\n", seq[0]->seq.s);
-            serial_no++;
 
             // R2
             sprintf(seq_name, "%s%zu", prefix, serial_no);
-            fprintf(stdout, ">%s\n", seq_name);
+            fprintf(stdout, ">%s/2\n", seq_name);
             fprintf(stdout, "%s\n", seq[1]->seq.s);
+
             serial_no++;
         }
         if (kseq_read(seq[1]) >= 0) {
@@ -1505,14 +1505,14 @@ int fa_interleave(int argc, char *argv[]) {
         while (kseq_read(seq) >= 0) {
             // R1
             sprintf(seq_name, "%s%zu", prefix, serial_no);
-            fprintf(stdout, ">%s\n", seq_name);
+            fprintf(stdout, ">%s/1\n", seq_name);
             fprintf(stdout, "%s\n", seq->seq.s);
-            serial_no++;
 
             // R2
             sprintf(seq_name, "%s%zu", prefix, serial_no);
-            fprintf(stdout, ">%s\n", seq_name);
+            fprintf(stdout, ">%s/2\n", seq_name);
             fprintf(stdout, "N\n");
+
             serial_no++;
         }
 
