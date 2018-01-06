@@ -1045,10 +1045,14 @@ int fa_split_name(int argc, char *argv[]) {
 
 int fa_split_about(int argc, char *argv[]) {
     int max_parts = 0;
+    int flag_even = 0;
     int option = 0, line = 80;
 
-    while ((option = getopt(argc, argv, "l:m:")) != -1) {
+    while ((option = getopt(argc, argv, "el:m:")) != -1) {
         switch (option) {
+            case 'e':
+                flag_even = 1;
+                break;
             case 'm':
                 max_parts = atoi(optarg);
                 break;
@@ -1071,6 +1075,7 @@ int fa_split_about(int argc, char *argv[]) {
                         "    faops split-about [options] <in.fa> <approx_size> <outdir>\n"
                         "\n"
                         "options:\n"
+                        "    -e         sequences in one file should be EVEN\n"
                         "    -m INT     max parts\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n",
@@ -1089,6 +1094,7 @@ int fa_split_about(int argc, char *argv[]) {
     char seq_name[512];
     char file_out[1024];
     long cur_size = 0;
+    long cur_count = 0;
     int file_count = 0, flag_first = 1;
 
 #ifdef __MINGW32__
@@ -1119,6 +1125,7 @@ int fa_split_about(int argc, char *argv[]) {
                 exit(1);
             }
         }
+
         sprintf(seq_name, "%s", seq->name.s);
         fprintf(fp_out, ">%s\n", seq_name);
 
@@ -1131,8 +1138,17 @@ int fa_split_about(int argc, char *argv[]) {
         fputc('\n', fp_out);
 
         cur_size += seq->seq.l;
+
+        if (flag_even) {
+            cur_count++;
+
+            if (cur_count % 2 != 0) {
+                continue;
+            }
+        }
         if (cur_size >= approx_size) {
             cur_size = 0;
+            cur_count = 0;
         }
     }
 
