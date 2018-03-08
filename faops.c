@@ -47,6 +47,7 @@ enum {
     N_BASE_VAL = 4
 };
 
+// Standard IUB/IUPAC Nucleic Acid Codes
 // Code =>  Nucleic Acid(s)
 //  A   =>  Adenine
 //  C   =>  Cytosine
@@ -160,7 +161,7 @@ static int compare_long_desc(const void *a, const void *b) {
     return 0;
 }
 
-// Count Ns in sequence
+// count Ns in sequence
 int count_n(char *str, long length) {
     int n_count = 0;
 
@@ -172,6 +173,15 @@ int count_n(char *str, long length) {
     }
 
     return n_count;
+}
+
+// convert IUPAC ambiguous codes to 'N'
+char convert_n(char nt) {
+    if (nt_val[(int) nt] == N_BASE_VAL || nt_val[(int) nt] == -1) {
+        return 'N';
+    } else {
+        return nt;
+    }
 }
 
 // https://biowize.wordpress.com/2013/03/05/using-kseq-h-with-stdin/
@@ -845,18 +855,20 @@ int fa_replace(int argc, char *argv[]) {
 }
 
 int fa_filter(int argc, char *argv[]) {
-    int flag_u = 0;
-    int flag_b = 0;
+    int flag_u = 0, flag_b = 0, flag_N = 0;
     int min_size = -1, max_size = -1, max_n = -1;
     int option = 0, opt_line = 80;
 
-    while ((option = getopt(argc, argv, "uba:z:n:l:")) != -1) {
+    while ((option = getopt(argc, argv, "ubNa:z:n:l:")) != -1) {
         switch (option) {
             case 'u':
                 flag_u = 1;
                 break;
             case 'b':
                 flag_b = 1;
+                break;
+            case 'N':
+                flag_N = 1;
                 break;
             case 'a':
                 min_size = atoi(optarg);
@@ -894,6 +906,7 @@ int fa_filter(int argc, char *argv[]) {
                         "    -n INT     pass sequences with fewer than this number of N's\n"
                         "    -u         Unique, removes duplicated ids, keeping the first\n"
                         "    -b         pretend to be a blocked fasta file\n"
+                        "    -N         convert IUPAC ambiguous codes to 'N'\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
@@ -951,7 +964,11 @@ int fa_filter(int argc, char *argv[]) {
                 if (opt_line != 0 && i != 0 && (i % opt_line) == 0) {
                     fputc('\n', stream_out);
                 }
-                fputc(seq->seq.s[i], stream_out);
+                if (flag_N) {
+                    fputc(convert_n(seq->seq.s[i]), stream_out);
+                } else {
+                    fputc(seq->seq.s[i], stream_out);
+                }
             }
             fputc('\n', stream_out);
 

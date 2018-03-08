@@ -32,6 +32,18 @@ load test_helper
     assert_equal "$exp" "$res"
 }
 
+@test "filter: as formatter, identical sequences (gz) with -N" {
+    exp=$(grep -v '^>' $BATS_TEST_DIRNAME/ufasta.fa | perl -ne 'chomp; print')
+    res=$($BATS_TEST_DIRNAME/../faops filter -l 0 -N $BATS_TEST_DIRNAME/ufasta.fa.gz stdout | grep -v '^>' | perl -ne 'chomp; print')
+    assert_equal "$exp" "$res"
+}
+
+@test "filter: convert IUPAC to N" {
+    exp=$(printf ">read\n%s\n" ANNG)
+    res=$($BATS_TEST_DIRNAME/../faops filter -l 0 -N <(printf ">read\n%s\n" AMRG) stdout)
+    assert_equal "$exp" "$res"
+}
+
 @test "filter: fastq to fasta" {
     run $BATS_TEST_DIRNAME/../faops filter $BATS_TEST_DIRNAME/test.seq stdout
     run bash -c "echo \"${output}\" | wc -l | xargs echo "
