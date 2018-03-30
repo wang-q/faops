@@ -12,7 +12,7 @@ before_install:
   # kent-tools
   - for f in faCount faSomeRecords faFilter; do
       wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/${f};
+      chmod +x $HOME/bin/${f}
     done
-  - chmod +x $HOME/bin/*
 script:
   - make test
