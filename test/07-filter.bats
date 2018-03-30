@@ -44,6 +44,12 @@ load test_helper
     assert_equal "$exp" "$res"
 }
 
+@test "filter: simplify seq names" {
+    exp=$(printf ">read\n%s\n" ANNG)
+    res=$($BATS_TEST_DIRNAME/../faops filter -l 0 -s <(printf ">read.1\n%s\n" ANNG) stdout)
+    assert_equal "$exp" "$res"
+}
+
 @test "filter: fastq to fasta" {
     run $BATS_TEST_DIRNAME/../faops filter $BATS_TEST_DIRNAME/test.seq stdout
     run bash -c "echo \"${output}\" | wc -l | xargs echo "

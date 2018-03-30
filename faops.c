@@ -855,11 +855,11 @@ int fa_replace(int argc, char *argv[]) {
 }
 
 int fa_filter(int argc, char *argv[]) {
-    int flag_u = 0, flag_b = 0, flag_N = 0;
+    int flag_u = 0, flag_b = 0, flag_N = 0, flag_s = 0;
     int min_size = -1, max_size = -1, max_n = -1;
     int option = 0, opt_line = 80;
 
-    while ((option = getopt(argc, argv, "ubNa:z:n:l:")) != -1) {
+    while ((option = getopt(argc, argv, "ubNsa:z:n:l:")) != -1) {
         switch (option) {
             case 'u':
                 flag_u = 1;
@@ -869,6 +869,9 @@ int fa_filter(int argc, char *argv[]) {
                 break;
             case 'N':
                 flag_N = 1;
+                break;
+            case 's':
+                flag_s = 1;
                 break;
             case 'a':
                 min_size = atoi(optarg);
@@ -907,6 +910,7 @@ int fa_filter(int argc, char *argv[]) {
                         "    -u         Unique, removes duplicated ids, keeping the first\n"
                         "    -b         pretend to be a blocked fasta file\n"
                         "    -N         convert IUPAC ambiguous codes to 'N'\n"
+                        "    -s         simplify sequence names\n"
                         "    -l INT     sequence line length [%d]\n"
                         "\n"
                         "in.fa  == stdin  means reading from stdin\n"
@@ -935,7 +939,11 @@ int fa_filter(int argc, char *argv[]) {
     int ret;  // return value from hashing
 
     while (kseq_read(seq) >= 0) {
-        sprintf(seq_name, "%s", seq->name.s);
+        if (flag_s) {
+            sprintf(seq_name, "%s", strtok(seq->name.s, " ,.-"));
+        } else {
+            sprintf(seq_name, "%s", seq->name.s);
+        }
         flag_pass = 1;
 
         if ((min_size >= 0) && (seq->seq.l < min_size)) {
