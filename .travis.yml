@@ -3,5 +3,13 @@ before_install:
   - sudo add-apt-repository ppa:duggan/bats --yes
   - sudo apt-get update -qq
   - sudo apt-get install -qq bats
+  # $HOME/bin
+  - mkdir -p $HOME/bin
+  - export PATH="$HOME/bin:$PATH"
+  # kent-tools
+  - for f in faCount faSomeRecords faFilter; do
+      wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/${f};
+    done
+  - chmod +x $HOME/bin/*
 script:
   - make test
