@@ -12,7 +12,8 @@ before_install:
   # kent-tools
   - for f in faCount faSomeRecords faFilter; do
       wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/${f};
-      chmod +x $HOME/bin/${f}
+      chmod +x $HOME/bin/${f};
     done
+
 script:
   - make test
