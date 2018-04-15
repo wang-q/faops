@@ -221,10 +221,10 @@ int fa_count(int argc, char *argv[]) {
     if (argc == optind) {
         fprintf(stderr,
                 "\n"
-                        "faops count - count base statistics in FA file(s).\n"
-                        "usage:\n"
-                        "    faops count <in.fa> [more_files.fa]\n"
-                        "\n");
+                "faops count - count base statistics in FA file(s).\n"
+                "usage:\n"
+                "    faops count <in.fa> [more_files.fa]\n"
+                "\n");
         exit(1);
     }
 
@@ -279,12 +279,12 @@ int fa_size(int argc, char *argv[]) {
     if (argc == optind) {
         fprintf(stderr,
                 "\n"
-                        "faops size - count total bases in FA file(s).\n"
-                        "usage:\n"
-                        "    faops size <in.fa> [more_files.fa]\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "\n");
+                "faops size - count total bases in FA file(s).\n"
+                "usage:\n"
+                "    faops size <in.fa> [more_files.fa]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "\n");
         exit(1);
     }
 
@@ -322,16 +322,16 @@ int fa_frag(int argc, char *argv[]) {
         !isdigit(argv[optind + 2][0])) {
         fprintf(stderr,
                 "\n"
-                        "faops frag - Extract a piece of DNA from a FA file.\n"
-                        "usage:\n"
-                        "    faops frag [options] <in.fa> <start> <end> <out.fa>\n"
-                        "\n"
-                        "options:\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "out.fa == stdout means writing to stdout\n"
-                        "\n",
+                "faops frag - Extract a piece of DNA from a FA file.\n"
+                "usage:\n"
+                "    faops frag [options] <in.fa> <start> <end> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n",
                 line);
         exit(1);
     }
@@ -425,20 +425,20 @@ int fa_rc(int argc, char *argv[]) {
     if (optind + 2 > argc) {
         fprintf(stderr,
                 "\n"
-                        "faops rc - Reverse complement a FA file.\n"
-                        "usage:\n"
-                        "    faops rc [options] <in.fa> <out.fa>\n"
-                        "\n"
-                        "options:\n"
-                        "    -n         keep name identical (don't prepend RC_)\n"
-                        "    -r         just Reverse, prepends R_\n"
-                        "    -c         just Complement, prepends C_\n"
-                        "    -f STR     only RC sequences in this list.file\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "out.fa == stdout means writing to stdout\n"
-                        "\n",
+                "faops rc - Reverse complement a FA file.\n"
+                "usage:\n"
+                "    faops rc [options] <in.fa> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -n         keep name identical (don't prepend RC_)\n"
+                "    -r         just Reverse, prepends R_\n"
+                "    -c         just Complement, prepends C_\n"
+                "    -f STR     only RC sequences in this list.file\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n",
                 line);
         exit(1);
     }
@@ -545,17 +545,17 @@ int fa_some(int argc, char *argv[]) {
     if (optind + 3 > argc) {
         fprintf(stderr,
                 "\n"
-                        "faops some - Extract multiple fa sequences\n"
-                        "usage:\n"
-                        "    faops some [options] <in.fa> <list.file> <out.fa>\n"
-                        "\n"
-                        "options:\n"
-                        "    -i         Invert, output sequences not in the list\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "out.fa == stdout means writing to stdout\n"
-                        "\n",
+                "faops some - Extract multiple fa sequences\n"
+                "usage:\n"
+                "    faops some [options] <in.fa> <list.file> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -i         Invert, output sequences not in the list\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n",
                 line);
         exit(1);
     }
@@ -664,17 +664,17 @@ int fa_order(int argc, char *argv[]) {
     if (optind + 3 > argc) {
         fprintf(stderr,
                 "\n"
-                        "faops order - Extract multiple fa sequences by the given order.\n"
-                        "              Consume much more memory for load all sequences in memory.\n"
-                        "usage:\n"
-                        "    faops order [options] <in.fa> <list.file> <out.fa>\n"
-                        "\n"
-                        "options:\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "out.fa == stdout means writing to stdout\n"
-                        "\n",
+                "faops order - Extract multiple fa sequences by the given order.\n"
+                "              Consume much more memory for load all sequences in memory.\n"
+                "usage:\n"
+                "    faops order [options] <in.fa> <list.file> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n",
                 line);
         exit(1);
     }
@@ -776,19 +776,19 @@ int fa_replace(int argc, char *argv[]) {
     if (optind + 3 > argc) {
         fprintf(stderr,
                 "\n"
-                        "faops replace - Replace headers from a FA file\n"
-                        "usage:\n"
-                        "    faops replace [options] <in.fa> <replace.tsv> <out.fa>\n"
-                        "\n"
-                        "options:\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "<replace.tsv> is a tab-separated file containing two fields\n"
-                        "    original_name\treplace_name\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "out.fa == stdout means writing to stdout\n"
-                        "\n",
+                "faops replace - Replace headers from a FA file\n"
+                "usage:\n"
+                "    faops replace [options] <in.fa> <replace.tsv> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "<replace.tsv> is a tab-separated file containing two fields\n"
+                "    original_name\treplace_name\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n",
                 line);
         exit(1);
     }
@@ -899,26 +899,26 @@ int fa_filter(int argc, char *argv[]) {
         fprintf(
                 stderr,
                 "\n"
-                        "faops filter - Filter fa records\n"
-                        "usage:\n"
-                        "    faops filter [options] <in.fa> <out.fa>\n"
-                        "\n"
-                        "options:\n"
-                        "    -a INT     pass sequences at least this big ('a'-smallest)\n"
-                        "    -z INT     pass sequences this size or smaller ('z'-biggest)\n"
-                        "    -n INT     pass sequences with fewer than this number of N's\n"
-                        "    -u         Unique, removes duplicated ids, keeping the first\n"
-                        "    -b         pretend to be a blocked fasta file\n"
-                        "    -N         convert IUPAC ambiguous codes to 'N'\n"
-                        "    -s         simplify sequence names\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "out.fa == stdout means writing to stdout\n"
-                        "\n"
-                        "Not all faFilter options were implemented.\n"
-                        "Names' wildcards are easily accomplished by \"faops some\".\n"
-                        "\n",
+                "faops filter - Filter fa records\n"
+                "usage:\n"
+                "    faops filter [options] <in.fa> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -a INT     pass sequences at least this big ('a'-smallest)\n"
+                "    -z INT     pass sequences this size or smaller ('z'-biggest)\n"
+                "    -n INT     pass sequences with fewer than this number of N's\n"
+                "    -u         Unique, removes duplicated ids, keeping the first\n"
+                "    -b         pretend to be a blocked fasta file\n"
+                "    -N         convert IUPAC ambiguous codes to 'N'\n"
+                "    -s         simplify sequence names\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n"
+                "Not all faFilter options were implemented.\n"
+                "Names' wildcards are easily accomplished by \"faops some\".\n"
+                "\n",
                 opt_line);
         exit(1);
     }
@@ -1011,16 +1011,16 @@ int fa_split_name(int argc, char *argv[]) {
     if (optind + 2 > argc) {
         fprintf(stderr,
                 "\n"
-                        "faops split-name - Split an fa file into several files\n"
-                        "                   Using sequence names as file names\n"
-                        "usage:\n"
-                        "    faops split-name [options] <in.fa> <outdir>\n"
-                        "\n"
-                        "options:\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "\n",
+                "faops split-name - Split an fa file into several files\n"
+                "                   Using sequence names as file names\n"
+                "usage:\n"
+                "    faops split-name [options] <in.fa> <outdir>\n"
+                "\n"
+                "options:\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "\n",
                 line);
         exit(1);
     }
@@ -1094,16 +1094,16 @@ int fa_split_about(int argc, char *argv[]) {
         fprintf(
                 stderr,
                 "\n"
-                        "faops split-about - Split an fa file into several files\n"
-                        "                    of about approx_size bytes each by record\n"
-                        "usage:\n"
-                        "    faops split-about [options] <in.fa> <approx_size> <outdir>\n"
-                        "\n"
-                        "options:\n"
-                        "    -e         sequences in one file should be EVEN\n"
-                        "    -m INT     max parts\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n",
+                "faops split-about - Split an fa file into several files\n"
+                "                    of about approx_size bytes each by record\n"
+                "usage:\n"
+                "    faops split-about [options] <in.fa> <approx_size> <outdir>\n"
+                "\n"
+                "options:\n"
+                "    -e         sequences in one file should be EVEN\n"
+                "    -m INT     max parts\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n",
                 line);
         exit(1);
     }
@@ -1224,21 +1224,21 @@ int fa_n50(int argc, char *argv[]) {
     if (optind + 1 > argc) {
         fprintf(stderr,
                 "\n"
-                        "faops n50 - compute N50 and other statistics.\n"
-                        "usage:\n"
-                        "    faops n50 [options] <in.fa> [more_files.fa]\n"
-                        "\n"
-                        "options:\n"
-                        "    -H         do not display header\n"
-                        "    -N INT     compute Nx statistic [%d]\n"
-                        "    -S         compute sum of size of all entries\n"
-                        "    -A         compute average length of all entries\n"
-                        "    -E         compute the E-size (from GAGE)\n"
-                        "    -C         count entries\n"
-                        "    -g INT     size of genome, instead of total size in files\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "\n",
+                "faops n50 - compute N50 and other statistics.\n"
+                "usage:\n"
+                "    faops n50 [options] <in.fa> [more_files.fa]\n"
+                "\n"
+                "options:\n"
+                "    -H         do not display header\n"
+                "    -N INT     compute Nx statistic [%d]\n"
+                "    -S         compute sum of size of all entries\n"
+                "    -A         compute average length of all entries\n"
+                "    -E         compute the E-size (from GAGE)\n"
+                "    -C         count entries\n"
+                "    -g INT     size of genome, instead of total size in files\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "\n",
                 n_given);
         exit(1);
     }
@@ -1374,22 +1374,22 @@ int fa_dazz(int argc, char *argv[]) {
         fprintf(
                 stderr,
                 "\n"
-                        "faops dazz - Rename records for dazz_db\n"
-                        "usage:\n"
-                        "    faops dazz [options] <in.fa> <out.fa>\n"
-                        "\n"
-                        "options:\n"
-                        "    -p STR     prefix of names [read]\n"
-                        "    -s INT     start index [1]\n"
-                        "    -a         don't drop duplicated ids\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "out.fa == stdout means writing to stdout\n"
-                        "\n"
-                        "Sequences with duplicated ids will be dropped, keeping the first one.\n"
-                        "This command don't write a replace.tsv file, `anchr dazzname` does.\n"
-                        "\n",
+                "faops dazz - Rename records for dazz_db\n"
+                "usage:\n"
+                "    faops dazz [options] <in.fa> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -p STR     prefix of names [read]\n"
+                "    -s INT     start index [1]\n"
+                "    -a         don't drop duplicated ids\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n"
+                "Sequences with duplicated ids will be dropped, keeping the first one.\n"
+                "This command don't write a replace.tsv file, `anchr dazzname` does.\n"
+                "\n",
                 opt_line);
         exit(1);
     }
@@ -1477,18 +1477,18 @@ int fa_interleave(int argc, char *argv[]) {
         fprintf(
                 stderr,
                 "\n"
-                        "faops interleave - Interleave two PE files\n"
-                        "                   One file is also OK, output a single N.\n"
-                        "usage:\n"
-                        "    faops interleave [options] <R1.fa> [R2.fa]\n"
-                        "\n"
-                        "options:\n"
-                        "    -p STR     prefix of names [read]\n"
-                        "    -s INT     start index [0]\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "Write to stdout and don't support reading from stdin.\n"
-                        "\n",
+                "faops interleave - Interleave two PE files\n"
+                "                   One file is also OK, output a single N.\n"
+                "usage:\n"
+                "    faops interleave [options] <R1.fa> [R2.fa]\n"
+                "\n"
+                "options:\n"
+                "    -p STR     prefix of names [read]\n"
+                "    -s INT     start index [0]\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "Write to stdout and don't support reading from stdin.\n"
+                "\n",
                 opt_line);
         exit(1);
     }
@@ -1565,10 +1565,14 @@ int fa_interleave(int argc, char *argv[]) {
 }
 
 int fa_region(int argc, char *argv[]) {
+    int flag_strand = 0;
     int option = 0, line = 80;
 
-    while ((option = getopt(argc, argv, "l:")) != -1) {
+    while ((option = getopt(argc, argv, "sl:")) != -1) {
         switch (option) {
+            case 's':
+                flag_strand = 1;
+                break;
             case 'l':
                 line = atoi(optarg);
                 break;
@@ -1581,19 +1585,20 @@ int fa_region(int argc, char *argv[]) {
     if (optind + 3 > argc) {
         fprintf(stderr,
                 "\n"
-                        "faops region - Extract regions from a FA file\n"
-                        "usage:\n"
-                        "    faops region [options] <in.fa> <region.txt> <out.fa>\n"
-                        "\n"
-                        "options:\n"
-                        "    -l INT     sequence line length [%d]\n"
-                        "\n"
-                        "<region.txt> is a text file containing one field\n"
-                        "    seq_name:begin-end[,begin-end]\n"
-                        "\n"
-                        "in.fa  == stdin  means reading from stdin\n"
-                        "out.fa == stdout means writing to stdout\n"
-                        "\n",
+                "faops region - Extract regions from a FA file\n"
+                "usage:\n"
+                "    faops region [options] <in.fa> <region.txt> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -s         add strand '(+)' to headers\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "<region.txt> is a text file containing one field\n"
+                "    seq_name:begin-end[,begin-end]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n",
                 line);
         exit(1);
     }
@@ -1660,10 +1665,18 @@ int fa_region(int argc, char *argv[]) {
                     end = begin;
                 }
 
-                if (begin < end) {
-                    fprintf(stream_out, ">%s:%d-%d\n", seq_name, begin, end);
+                if (flag_strand) {
+                    if (begin < end) {
+                        fprintf(stream_out, ">%s(+):%d-%d\n", seq_name, begin, end);
+                    } else {
+                        fprintf(stream_out, ">%s(+):%d\n", seq_name, begin);
+                    }
                 } else {
-                    fprintf(stream_out, ">%s:%d\n", seq_name, begin);
+                    if (begin < end) {
+                        fprintf(stream_out, ">%s:%d-%d\n", seq_name, begin, end);
+                    } else {
+                        fprintf(stream_out, ">%s:%d\n", seq_name, begin);
+                    }
                 }
 
                 for (int i = begin - 1; i < end; i++) {
@@ -1689,31 +1702,31 @@ int fa_region(int argc, char *argv[]) {
 char *version = "0.8.10";
 char *message =
         "\n"
-                "Usage:     faops <command> [options] <arguments>\n"
-                "Version:   %s\n"
-                "\n"
-                "Commands:\n"
-                "    help           print this message\n"
-                "    count          count base statistics in FA file(s)\n"
-                "    size           count total bases in FA file(s)\n"
-                "    frag           extract sub-sequences from a FA file\n"
-                "    rc             reverse complement a FA file\n"
-                "    some           extract some fa records\n"
-                "    order          extract some fa records by the given order\n"
-                "    replace        replace headers from a FA file\n"
-                "    filter         filter fa records\n"
-                "    split-name     splitting by sequence names\n"
-                "    split-about    splitting to chunks about specified size\n"
-                "    n50            compute N50 and other statistics\n"
-                "    dazz           rename records for dazz_db\n"
-                "    interleave     interleave two PE files\n"
-                "    region         extract regions from a FA file\n"
-                "\n"
-                "Options:\n"
-                "    There're no global options.\n"
-                "    Type \"faops command-name\" for detailed options of each command.\n"
-                "    Options *MUST* be placed just after command.\n"
-                "\n";
+        "Usage:     faops <command> [options] <arguments>\n"
+        "Version:   %s\n"
+        "\n"
+        "Commands:\n"
+        "    help           print this message\n"
+        "    count          count base statistics in FA file(s)\n"
+        "    size           count total bases in FA file(s)\n"
+        "    frag           extract sub-sequences from a FA file\n"
+        "    rc             reverse complement a FA file\n"
+        "    some           extract some fa records\n"
+        "    order          extract some fa records by the given order\n"
+        "    replace        replace headers from a FA file\n"
+        "    filter         filter fa records\n"
+        "    split-name     splitting by sequence names\n"
+        "    split-about    splitting to chunks about specified size\n"
+        "    n50            compute N50 and other statistics\n"
+        "    dazz           rename records for dazz_db\n"
+        "    interleave     interleave two PE files\n"
+        "    region         extract regions from a FA file\n"
+        "\n"
+        "Options:\n"
+        "    There're no global options.\n"
+        "    Type \"faops command-name\" for detailed options of each command.\n"
+        "    Options *MUST* be placed just after command.\n"
+        "\n";
 
 static int usage() {
     fprintf(stderr, message, version);

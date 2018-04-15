@@ -20,6 +20,12 @@ load test_helper
     assert_equal "${exp}" "${res}"
 }
 
+@test "region: strand" {
+    exp=$(echo -e ">read0(+):10\nC")
+    res=$($BATS_TEST_DIRNAME/../faops region -s -l 0 $BATS_TEST_DIRNAME/ufasta.fa <(echo read0:10) stdout)
+    assert_equal "${exp}" "${res}"
+}
+
 @test "region: regions" {
     exp=4
     res=$($BATS_TEST_DIRNAME/../faops region -l 0 $BATS_TEST_DIRNAME/ufasta.fa <(echo read1:1-10,50-60) stdout | wc -l | xargs echo)
