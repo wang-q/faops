@@ -44,6 +44,12 @@ load test_helper
     assert_equal "$exp" "$res"
 }
 
+@test "filter: Upper cases" {
+    exp=$(printf ">read\n%s\n" ATCG)
+    res=$($BATS_TEST_DIRNAME/../faops filter -l 0 -U <(printf ">read\n%s\n" AtcG) stdout)
+    assert_equal "$exp" "$res"
+}
+
 @test "filter: simplify seq names" {
     exp=$(printf ">read\n%s\n" ANNG)
     res=$($BATS_TEST_DIRNAME/../faops filter -l 0 -s <(printf ">read.1\n%s\n" ANNG) stdout)

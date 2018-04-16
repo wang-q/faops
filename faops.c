@@ -184,6 +184,11 @@ char convert_n(char nt) {
     }
 }
 
+// convert to Upper case
+char convert_U(char nt) {
+    return (char) toupper(nt);
+}
+
 // https://biowize.wordpress.com/2013/03/05/using-kseq-h-with-stdin/
 // stream_in
 FILE *source_in(char *file) {
@@ -855,14 +860,17 @@ int fa_replace(int argc, char *argv[]) {
 }
 
 int fa_filter(int argc, char *argv[]) {
-    int flag_u = 0, flag_b = 0, flag_N = 0, flag_s = 0;
+    int flag_u = 0, flag_U = 0, flag_b = 0, flag_N = 0, flag_s = 0;
     int min_size = -1, max_size = -1, max_n = -1;
     int option = 0, opt_line = 80;
 
-    while ((option = getopt(argc, argv, "ubNsa:z:n:l:")) != -1) {
+    while ((option = getopt(argc, argv, "uUbNsa:z:n:l:")) != -1) {
         switch (option) {
             case 'u':
                 flag_u = 1;
+                break;
+            case 'U':
+                flag_U = 1;
                 break;
             case 'b':
                 flag_b = 1;
@@ -908,6 +916,7 @@ int fa_filter(int argc, char *argv[]) {
                 "    -z INT     pass sequences this size or smaller ('z'-biggest)\n"
                 "    -n INT     pass sequences with fewer than this number of N's\n"
                 "    -u         Unique, removes duplicated ids, keeping the first\n"
+                "    -U         Upper case, converts all sequences to upper cases\n"
                 "    -b         pretend to be a blocked fasta file\n"
                 "    -N         convert IUPAC ambiguous codes to 'N'\n"
                 "    -s         simplify sequence names\n"
@@ -973,9 +982,17 @@ int fa_filter(int argc, char *argv[]) {
                     fputc('\n', stream_out);
                 }
                 if (flag_N) {
-                    fputc(convert_n(seq->seq.s[i]), stream_out);
+                    if (flag_U) {
+                        fputc(convert_U(convert_n(seq->seq.s[i])), stream_out);
+                    } else {
+                        fputc(convert_n(seq->seq.s[i]), stream_out);
+                    }
                 } else {
-                    fputc(seq->seq.s[i], stream_out);
+                    if (flag_U) {
+                        fputc(convert_U(seq->seq.s[i]), stream_out);
+                    } else {
+                        fputc(seq->seq.s[i], stream_out);
+                    }
                 }
             }
             fputc('\n', stream_out);
