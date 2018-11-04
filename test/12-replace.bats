@@ -7,6 +7,8 @@ load test_helper
 
 # ./faops replace -l 0 test/ufasta.fa <(printf "%s\t%s\n" read12 428) stdout
 
+# ./faops replace -s test/ufasta.fa <(printf "%s\t%s\n" read12 428) stdout | wc -l | xargs
+
 # ./faops replace -l 0 test/ufasta.fa test/replace.tsv stdout
 
 @test "replace: inline names" {
@@ -14,6 +16,15 @@ load test_helper
     res=$($BATS_TEST_DIRNAME/../faops replace $BATS_TEST_DIRNAME/ufasta.fa \
         <(printf "%s\t%s\n" read12 428) stdout \
         | grep '^>428')
+    assert_equal "$exp" "$res"
+}
+
+@test "replace: -s" {
+    exp="7"
+    res=$($BATS_TEST_DIRNAME/../faops replace -s $BATS_TEST_DIRNAME/ufasta.fa \
+        <(printf "%s\t%s\n" read12 428) stdout |
+        wc -l |
+        xargs echo)
     assert_equal "$exp" "$res"
 }
 

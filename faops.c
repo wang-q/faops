@@ -765,10 +765,14 @@ int fa_order(int argc, char *argv[]) {
 }
 
 int fa_replace(int argc, char *argv[]) {
+    int flag_s = 0;
     int option = 0, line = 80;
 
-    while ((option = getopt(argc, argv, "l:")) != -1) {
+    while ((option = getopt(argc, argv, "sl:")) != -1) {
         switch (option) {
+            case 's':
+                flag_s = 1;
+                break;
             case 'l':
                 line = atoi(optarg);
                 break;
@@ -786,6 +790,7 @@ int fa_replace(int argc, char *argv[]) {
                 "    faops replace [options] <in.fa> <replace.tsv> <out.fa>\n"
                 "\n"
                 "options:\n"
+                "    -s         only output sequences in the list, like `faops some`\n"
                 "    -l INT     sequence line length [%d]\n"
                 "\n"
                 "<replace.tsv> is a tab-separated file containing two fields\n"
@@ -838,6 +843,9 @@ int fa_replace(int argc, char *argv[]) {
         if (entry != kh_end(hash)) {
             fprintf(stream_out, ">%s\n", kh_val(hash, entry));
         } else {
+            if (flag_s) {
+                continue;
+            }
             fprintf(stream_out, ">%s\n", seq_name);
         }
 
