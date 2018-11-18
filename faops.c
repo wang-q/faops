@@ -175,9 +175,13 @@ int count_n(char *str, long length) {
     return n_count;
 }
 
+int is_n(char nt) {
+    return (nt_val[(int) nt] == N_BASE_VAL || nt_val[(int) nt] == -1);
+}
+
 // convert IUPAC ambiguous codes to 'N'
 char convert_n(char nt) {
-    if (nt_val[(int) nt] == N_BASE_VAL || nt_val[(int) nt] == -1) {
+    if (is_n(nt)) {
         return 'N';
     } else {
         return nt;
@@ -300,6 +304,82 @@ int fa_size(int argc, char *argv[]) {
         while (kseq_read(seq) >= 0) {
             printf("%s\t%lu", seq->name.s, seq->seq.l);
             printf("\n");
+        }
+
+        kseq_destroy(seq);
+        gzclose(fp);
+    }
+
+    return 0;
+}
+
+int fa_masked(int argc, char *argv[]) {
+    int flag_g = 0;
+    int option = 0;
+
+    while ((option = getopt(argc, argv, "g")) != -1) {
+        switch (option) {
+            case 'g':
+                flag_g = 1;
+                break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
+        }
+    }
+
+    if (argc == optind) {
+        fprintf(
+                stderr,
+                "\n"
+                "faops masked - Masked (or gaps) regions in fasta files\n"
+                "usage:\n"
+                "    faops masked [options] <in.fa> [more_files.fa]\n"
+                "\n"
+                "options:\n"
+                "    -g         only record regions of N/n\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "\n");
+        exit(1);
+    }
+
+    for (int f = optind; f < argc; ++f) {
+        gzFile fp = gzdopen(fileno(source_in(argv[f])), "r");
+        kseq_t *seq = kseq_init(fp);
+
+        while (kseq_read(seq) >= 0) {
+            int begin = 0, end = 0;
+            for (int i = 0; i < seq->seq.l; i++) {
+                if (flag_g
+                    ? is_n(seq->seq.s[i])
+                    : (is_n(seq->seq.s[i]) || islower(seq->seq.s[i]))) {
+                    if (begin == 0) {
+                        begin = i, end = i;
+                    } else {
+                        end = i;
+                    }
+                } else if (begin != 0) {
+                    if (begin == end) {
+                        printf("%s:%u\n", seq->name.s, begin + 1);
+                    } else {
+                        printf("%s:%u-%u\n", seq->name.s, begin + 1, end + 1);
+                    }
+                    // reset
+                    begin = 0, end = 0;
+                }
+
+
+            }
+
+            // last region
+            if (begin != 0) {
+                if (begin == end) {
+                    printf("%s:%u\n", seq->name.s, begin + 1);
+                } else {
+                    printf("%s:%u-%u\n", seq->name.s, begin + 1, end + 1);
+                }
+            }
         }
 
         kseq_destroy(seq);
@@ -1773,6 +1853,8 @@ int main(int argc, char *argv[]) {
         fa_count(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "size") == 0) {
         fa_size(argc - 1, argv + 1);
+    } else if (strcmp(argv[1], "masked") == 0) {
+        fa_masked(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "frag") == 0) {
         fa_frag(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "rc") == 0) {
