@@ -349,31 +349,31 @@ int fa_masked(int argc, char *argv[]) {
         kseq_t *seq = kseq_init(fp);
 
         while (kseq_read(seq) >= 0) {
-            int begin = 0, end = 0;
+            int begin = -1, end = -1;
             for (int i = 0; i < seq->seq.l; i++) {
                 if (flag_g
                     ? is_n(seq->seq.s[i])
                     : (is_n(seq->seq.s[i]) || islower(seq->seq.s[i]))) {
-                    if (begin == 0) {
+                    if (begin == -1) {
                         begin = i, end = i;
                     } else {
                         end = i;
                     }
-                } else if (begin != 0) {
+                } else if (begin != -1) {
                     if (begin == end) {
                         printf("%s:%u\n", seq->name.s, begin + 1);
                     } else {
                         printf("%s:%u-%u\n", seq->name.s, begin + 1, end + 1);
                     }
                     // reset
-                    begin = 0, end = 0;
+                    begin = -1, end = -1;
                 }
 
 
             }
 
             // last region
-            if (begin != 0) {
+            if (begin != -1) {
                 if (begin == end) {
                     printf("%s:%u\n", seq->name.s, begin + 1);
                 } else {

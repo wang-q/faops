@@ -7,3 +7,9 @@ load test_helper
     res=$($BATS_TEST_DIRNAME/../faops masked $BATS_TEST_DIRNAME/ufasta.fa | grep '^read46' | head -n 1)
     assert_equal "$exp" "$res"
 }
+
+@test "masked" {
+    exp="read0:1"
+    res=$($BATS_TEST_DIRNAME/../faops masked $BATS_TEST_DIRNAME/ufasta.fa | grep '^read0' | head -n 1)
+    assert_equal "$exp" "$res"
+}
