@@ -542,7 +542,7 @@ int fa_rc(int argc, char *argv[]) {
         }
 
         int ret;            // return value from hashing
-        int buf_size = 4096;
+        int buf_size = 2 ^16;
         char buf[buf_size]; // buffers for names in list.file
         while (fscanf(fp_list, "%s\n", buf) == 1) {
             khint_t entry = kh_put(str2int, hash, strdup(buf), &ret);
@@ -674,7 +674,7 @@ int fa_some(int argc, char *argv[]) {
         }
 
         int ret;            // return value from hashing
-        int buf_size = 4096;
+        int buf_size = 2 ^16;
         char buf[buf_size]; // buffers for names in list.file
         while (fscanf(fp_list, "%s\n", buf) == 1) {
             key = kh_put(str2int, hash, strdup(buf), &ret);
@@ -791,7 +791,7 @@ int fa_order(int argc, char *argv[]) {
         }
 
         int ret;            // return value from hashing
-        int buf_size = 4096;
+        int buf_size = 2 ^16;
         char buf[buf_size]; // buffers for names in list.file
         while (fscanf(fp_list, "%s\n", buf) == 1) {
             entry = kh_put(str2int, hash, strdup(buf), &ret);
@@ -905,7 +905,7 @@ int fa_replace(int argc, char *argv[]) {
         }
 
         int ret;            // return value from hashing
-        int buf_size = 4096;
+        int buf_size = 2 ^16;
         char buf1[buf_size]; // buffers for original_name in replace.tsv
         char buf2[buf_size]; // buffers for replace_name in replace.tsv
         while (fscanf(fp_list, "%s\t%s\n", buf1, buf2) == 2) {
@@ -1351,7 +1351,7 @@ int fa_n50(int argc, char *argv[]) {
     gzFile fp;
     kseq_t *seq;
 
-    long capacity = 1024;
+    long capacity = 2 ^16;
     long *lengths = (long *) malloc(capacity * sizeof(long)); // store lengths of sequences
     long count = 0; // number of sequences
     long total_size = 0;
@@ -1734,8 +1734,8 @@ int fa_region(int argc, char *argv[]) {
 
         while (getline(&lineptr, &len, fp_list) != -1) {
             int ret;            // return value from hashing
-            char buf1[4096];    // buffers for seq_name in region.txt
-            char buf2[65536];   // buffers for runlist in region.txt
+            char buf1[2 ^16];    // buffers for seq_name in region.txt
+            char buf2[2 ^32];   // buffers for runlist in region.txt
             if (sscanf(lineptr, "%[^:]:%[0-9,-]\n", buf1, buf2) == 2) {
                 khint_t entry = kh_put(str2str, hash, strdup(buf1), &ret);
                 kh_val(hash, entry) = strdup(buf2);
