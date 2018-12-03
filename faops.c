@@ -39,7 +39,6 @@ KHASH_MAP_INIT_STR(str2str, char*)
 #define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
 
 enum {
-    SEQ_NAME_SIZE = 2 ^9,
     BUFFER_SIZE = 2 ^16,
     BUFFER_SIZE_LONG = 2 ^32
 };
@@ -442,7 +441,6 @@ int fa_frag(int argc, char *argv[]) {
 
     FILE *stream_out = source_out(file_out);
 
-    // FIXME: Can't use SEQ_NAME_SIZE here. Don't know why.
     char seq_name[512];
     int is_first = 1;
 
@@ -570,7 +568,7 @@ int fa_rc(int argc, char *argv[]) {
     FILE *stream_out = source_out(fn_out);
 
     while (kseq_read(seq) >= 0) {
-        char seq_name[SEQ_NAME_SIZE];
+        char seq_name[512];
         sprintf(seq_name, "%s", seq->name.s);
         if (strcmp(fn_list, "") != 0) {
             if (kh_get(str2int, hash, seq_name) != kh_end(hash)) {
@@ -662,7 +660,7 @@ int fa_some(int argc, char *argv[]) {
 
     FILE *stream_out = source_out(file_out);
 
-    char seq_name[SEQ_NAME_SIZE];
+    char seq_name[512];
 
     // variables for hashing
     // from Heng Li's replay to http://www.biostars.org/p/10353/
@@ -816,7 +814,7 @@ int fa_order(int argc, char *argv[]) {
     buf_seq = calloc((size_t) serial, sizeof(kseq_t));
 
     while (kseq_read(seq) >= 0) {
-        char seq_name[SEQ_NAME_SIZE];
+        char seq_name[512];
         sprintf(seq_name, "%s", seq->name.s);
 
         entry = kh_get(str2int, hash, seq_name);
@@ -899,7 +897,7 @@ int fa_replace(int argc, char *argv[]) {
     kseq_t *seq = kseq_init(fp);
 
     FILE *stream_out = source_out(file_out);
-    char seq_name[SEQ_NAME_SIZE];
+    char seq_name[512];
 
     //  Read replace.tsv to a hash table
     khash_t(str2str) *hash;
@@ -1035,7 +1033,7 @@ int fa_filter(int argc, char *argv[]) {
     kseq_t *seq = kseq_init(fp);
 
     FILE *stream_out = source_out(file_out);
-    char seq_name[SEQ_NAME_SIZE];
+    char seq_name[512];
     int flag_pass;
 
     // variables for hashing
@@ -1145,7 +1143,7 @@ int fa_split_name(int argc, char *argv[]) {
     kseq_t *seq = kseq_init(fp);
 
     FILE *fp_out;
-    char seq_name[SEQ_NAME_SIZE];
+    char seq_name[512];
     char file_out[1024];
 
 #ifdef __MINGW32__
@@ -1229,7 +1227,7 @@ int fa_split_about(int argc, char *argv[]) {
     kseq_t *seq = kseq_init(fp);
 
     FILE *fp_out;
-    char seq_name[SEQ_NAME_SIZE];
+    char seq_name[512];
     char file_out[1024];
     long cur_size = 0;
     long cur_count = 0;
@@ -1514,7 +1512,7 @@ int fa_dazz(int argc, char *argv[]) {
     kseq_t *seq = kseq_init(fp);
 
     FILE *stream_out = source_out(file_out);
-    char seq_name[SEQ_NAME_SIZE];
+    char seq_name[512];
     int flag_pass;
 
     // variables for hashing
@@ -1618,7 +1616,7 @@ int fa_interleave(int argc, char *argv[]) {
         seq[0] = kseq_init(fp1);
         seq[1] = kseq_init(fp2);
 
-        char seq_name[SEQ_NAME_SIZE];
+        char seq_name[512];
 
         long serial_no = start_index; // serial
         while (kseq_read(seq[0]) >= 0) {
@@ -1653,7 +1651,7 @@ int fa_interleave(int argc, char *argv[]) {
         gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
         kseq_t *seq = kseq_init(fp);
 
-        char seq_name[SEQ_NAME_SIZE];
+        char seq_name[512];
 
         long serial_no = start_index; // serial
         while (kseq_read(seq) >= 0) {
@@ -1724,7 +1722,7 @@ int fa_region(int argc, char *argv[]) {
     kseq_t *seq = kseq_init(fp);
 
     FILE *stream_out = source_out(file_out);
-    char seq_name[SEQ_NAME_SIZE];
+    char seq_name[512];
 
     //  Read region.txt to hash table
     khash_t(str2str) *hash;
@@ -1742,7 +1740,7 @@ int fa_region(int argc, char *argv[]) {
 
         while (getline(&lineptr, &len, fp_list) != -1) {
             int ret;            // return value from hashing
-            char buf1[SEQ_NAME_SIZE];    // buffers for seq_name in region.txt
+            char buf1[512];    // buffers for seq_name in region.txt
             char buf2[BUFFER_SIZE_LONG];   // buffers for runlist in region.txt
             if (sscanf(lineptr, "%[^:]:%[0-9,-]\n", buf1, buf2) == 2) {
                 khint_t entry = kh_put(str2str, hash, strdup(buf1), &ret);
