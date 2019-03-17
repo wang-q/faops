@@ -1565,7 +1565,7 @@ int fa_dazz(int argc, char *argv[]) {
 int fa_interleave(int argc, char *argv[]) {
     char *prefix = "read";
     long start_index = 0;
-    int option = 0, opt_line = 0;
+    int option = 0;
 
     while ((option = getopt(argc, argv, "p:s:l:")) != -1) {
         switch (option) {
@@ -1574,9 +1574,6 @@ int fa_interleave(int argc, char *argv[]) {
                 break;
             case 's':
                 start_index = atol(optarg);
-                break;
-            case 'l':
-                opt_line = atoi(optarg);
                 break;
             default:
                 fprintf(stderr, "Unsupported option\n");
@@ -1596,11 +1593,9 @@ int fa_interleave(int argc, char *argv[]) {
                 "options:\n"
                 "    -p STR     prefix of names [read]\n"
                 "    -s INT     start index [0]\n"
-                "    -l INT     sequence line length [%d]\n"
                 "\n"
                 "Write to stdout and don't support reading from stdin.\n"
-                "\n",
-                opt_line);
+                "\n");
         exit(1);
     }
 
