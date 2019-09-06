@@ -44,6 +44,12 @@ load test_helper
     assert_equal "$exp" "$res"
 }
 
+@test "filter: remove dashes" {
+    exp=$(printf ">read\n%s\n" ARG)
+    res=$($BATS_TEST_DIRNAME/../faops filter -l 0 -d <(printf ">read\n%s\n" A-RG) stdout)
+    assert_equal "$exp" "$res"
+}
+
 @test "filter: Upper cases" {
     exp=$(printf ">read\n%s\n" ATCG)
     res=$($BATS_TEST_DIRNAME/../faops filter -l 0 -U <(printf ">read\n%s\n" AtcG) stdout)

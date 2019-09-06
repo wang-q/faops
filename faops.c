@@ -954,11 +954,11 @@ int fa_replace(int argc, char *argv[]) {
 }
 
 int fa_filter(int argc, char *argv[]) {
-    int flag_u = 0, flag_U = 0, flag_b = 0, flag_N = 0, flag_s = 0;
+    int flag_u = 0, flag_U = 0, flag_b = 0, flag_N = 0, flag_d = 0, flag_s = 0;
     int min_size = -1, max_size = -1, max_n = -1;
     int option = 0, opt_line = 80;
 
-    while ((option = getopt(argc, argv, "uUbNsa:z:n:l:")) != -1) {
+    while ((option = getopt(argc, argv, "uUbNdsa:z:n:l:")) != -1) {
         switch (option) {
             case 'u':
                 flag_u = 1;
@@ -971,6 +971,9 @@ int fa_filter(int argc, char *argv[]) {
                 break;
             case 'N':
                 flag_N = 1;
+                break;
+            case 'd':
+                flag_d = 1;
                 break;
             case 's':
                 flag_s = 1;
@@ -1013,6 +1016,7 @@ int fa_filter(int argc, char *argv[]) {
                 "    -U         Upper case, converts all sequences to upper cases\n"
                 "    -b         pretend to be a blocked fasta file\n"
                 "    -N         convert IUPAC ambiguous codes to 'N'\n"
+                "    -d         remove dashes '-'\n"
                 "    -s         simplify sequence names\n"
                 "    -l INT     sequence line length [%d]\n"
                 "\n"
@@ -1074,6 +1078,11 @@ int fa_filter(int argc, char *argv[]) {
             for (int i = 0; i < seq->seq.l; i++) {
                 if (opt_line != 0 && i != 0 && (i % opt_line) == 0) {
                     fputc('\n', stream_out);
+                }
+                if (flag_d) {
+                    if (seq->seq.s[i] == '-') {
+                        continue;
+                    }
                 }
                 if (flag_N) {
                     if (flag_U) {
