@@ -6,9 +6,14 @@ jobs:
   build:
 
     runs-on: ubuntu-18.04
-    
+
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/bin/bats@master
-    - run: make
-    - run: bats --tap test
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      - name: Install bats
+        run: |
+          apt-get update -qq
+          apt-get install -qq bats
+      - run: make
+      - run: bats --tap test
