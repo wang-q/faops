@@ -13,7 +13,7 @@ jobs:
           submodules: true
       - name: Install bats
         run: |
-          apt-get update -qq
-          apt-get install -qq bats
+          sudo apt-get update -qq
+          sudo apt-get install -qq bats
       - run: make
       - run: bats --tap test
