@@ -33,7 +33,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) ${COPTS} $(CFLAGS) $< -o $@
 
 test: all
-	@bats test --tap
+	@bats --tap test
 
 clean:
 	$(RM) $(OBJECTS) $(EXECUTABLE)
