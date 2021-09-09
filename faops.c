@@ -1824,6 +1824,7 @@ char *message =
         "    help           print this message\n"
         "    count          count base statistics in FA file(s)\n"
         "    size           count total bases in FA file(s)\n"
+        "    masked         masked (or gaps) regions in FA file(s)"
         "    frag           extract sub-sequences from a FA file\n"
         "    rc             reverse complement a FA file\n"
         "    some           extract some fa records\n"
