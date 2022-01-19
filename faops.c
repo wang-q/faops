@@ -1879,7 +1879,7 @@ int fa_region(int argc, char *argv[]) {
     return 0;
 }
 
-char *version = "0.8.17";
+char *version = "0.8.19";
 char *message =
         "\n"
         "Usage:     faops <command> [options] <arguments>\n"
@@ -1889,9 +1889,10 @@ char *message =
         "    help           print this message\n"
         "    count          count base statistics in FA file(s)\n"
         "    size           count total bases in FA file(s)\n"
-        "    masked         masked (or gaps) regions in FA file(s)"
+        "    masked         masked (or gaps) regions in FA file(s)\n"
         "    frag           extract sub-sequences from a FA file\n"
         "    rc             reverse complement a FA file\n"
+        "    one            extract one fa record\n"
         "    some           extract some fa records\n"
         "    order          extract some fa records by the given order\n"
         "    replace        replace headers from a FA file\n"

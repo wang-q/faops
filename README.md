@@ -26,14 +26,16 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 $ ./faops help
 
 Usage:     faops <command> [options] <arguments>
-Version:   0.8.17
+Version:   0.8.19
 
 Commands:
     help           print this message
     count          count base statistics in FA file(s)
     size           count total bases in FA file(s)
+    masked         masked (or gaps) regions in FA file(s)
     frag           extract sub-sequences from a FA file
     rc             reverse complement a FA file
+    one            extract one fa record
     some           extract some fa records
     order          extract some fa records by the given order
     replace        replace headers from a FA file
