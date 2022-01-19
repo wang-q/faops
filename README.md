@@ -1,4 +1,4 @@
-[![Travis](https://img.shields.io/travis/wang-q/faops.svg)](https://travis-ci.org/wang-q/faops)
+![Build](https://github.com/wang-q/faops/workflows/Build/badge.svg)
 
 # `faops` operates fasta files
 
@@ -26,7 +26,7 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 $ ./faops help
 
 Usage:     faops <command> [options] <arguments>
-Version:   0.8.19
+Version:   0.8.20
 
 Commands:
     help           print this message
