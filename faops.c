@@ -615,6 +615,71 @@ int fa_rc(int argc, char *argv[]) {
     return 0;
 }
 
+int fa_one(int argc, char *argv[]) {
+    int option = 0, line = 80;
+
+    while ((option = getopt(argc, argv, "l:")) != -1) {
+        switch (option) {
+            case 'l':
+                line = atoi(optarg);
+                break;
+            default:
+                fprintf(stderr, "Unsupported option\n");
+                exit(1);
+        }
+    }
+
+    if (optind + 3 > argc) {
+        fprintf(stderr,
+                "\n"
+                "faops one - Extract one fa sequence\n"
+                "usage:\n"
+                "    faops some [options] <in.fa> <name> <out.fa>\n"
+                "\n"
+                "options:\n"
+                "    -l INT     sequence line length [%d]\n"
+                "\n"
+                "in.fa  == stdin  means reading from stdin\n"
+                "out.fa == stdout means writing to stdout\n"
+                "\n",
+                line);
+        exit(1);
+    }
+
+    char *file_in = argv[optind];
+    char *name = argv[optind + 1];
+    char *file_out = argv[optind + 2];
+
+    gzFile fp = gzdopen(fileno(source_in(file_in)), "r");
+    kseq_t *seq = kseq_init(fp);
+
+    FILE *stream_out = source_out(file_out);
+
+    char seq_name[512];
+
+    while (kseq_read(seq) >= 0) {
+        sprintf(seq_name, "%s", seq->name.s);
+
+        if (strcmp(seq_name, name) == 0) {
+            fprintf(stream_out, ">%s\n", seq_name);
+            for (int i = 0; i < seq->seq.l; i++) {
+                if (line != 0 && i != 0 && (i % line) == 0) {
+                    fputc('\n', stream_out);
+                }
+                fputc(seq->seq.s[i], stream_out);
+            }
+            fputc('\n', stream_out);
+        }
+    }
+
+    kseq_destroy(seq);
+    gzclose(fp);
+    if (strcmp(file_out, "stdout") != 0) {
+        fclose(stream_out);
+    }
+    return 0;
+}
+
 int fa_some(int argc, char *argv[]) {
     int flag_i = 0;
     int option = 0, line = 80;
@@ -1870,6 +1935,8 @@ int main(int argc, char *argv[]) {
         fa_frag(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "rc") == 0) {
         fa_rc(argc - 1, argv + 1);
+    } else if (strcmp(argv[1], "one") == 0) {
+        fa_one(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "some") == 0) {
         fa_some(argc - 1, argv + 1);
     } else if (strcmp(argv[1], "order") == 0) {
