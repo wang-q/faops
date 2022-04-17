@@ -2,8 +2,7 @@
 
 # `faops` operates fasta files
 
-`faops` is a lightweight tool for operating sequences in the fasta
-format.
+`faops` is a lightweight tool for operating sequences in the fasta format.
 
 This tool can be regarded as a combination of `faCount`, `faSize`,
 `faFrag`, `faRc`, `faSomeRecords`, `faFilter` and `faSplit` from
@@ -22,7 +21,7 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 [`seqtk`](https://github.com/lh3/seqtk) and
 [`ufasta`](http://www.genome.umd.edu/masurca.html).
 
-```
+```text
 $ ./faops help
 
 Usage:     faops <command> [options] <arguments>
@@ -148,5 +147,5 @@ Qiang Wang &lt;wang-q@outlook.com&gt;
 
 This software is copyright (c) 2014 by Qiang Wang.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5
+programming language system itself.

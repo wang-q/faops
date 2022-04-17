@@ -10,7 +10,9 @@
 
 // create dir
 #ifdef __MINGW32__
+
 #include <direct.h>
+
 #else
 
 #include <sys/stat.h>
@@ -39,8 +41,8 @@ KHASH_MAP_INIT_STR(str2str, char*)
 #define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
 
 enum {
-    BUFFER_SIZE = 2 ^16,
-    BUFFER_SIZE_LONG = 2 ^32
+    BUFFER_SIZE = 2 ^ 16,
+    BUFFER_SIZE_LONG = 2 ^ 32
 };
 
 enum {
@@ -1637,12 +1639,16 @@ int fa_dazz(int argc, char *argv[]) {
 }
 
 int fa_interleave(int argc, char *argv[]) {
+    int flag_fq = 0;
     char *prefix = "read";
     long start_index = 0;
     int option = 0;
 
-    while ((option = getopt(argc, argv, "p:s:l:")) != -1) {
+    while ((option = getopt(argc, argv, "qp:s:")) != -1) {
         switch (option) {
+            case 'q':
+                flag_fq = 1;
+                break;
             case 'p':
                 prefix = optarg;
                 break;
@@ -1660,11 +1666,13 @@ int fa_interleave(int argc, char *argv[]) {
                 stderr,
                 "\n"
                 "faops interleave - Interleave two PE files\n"
-                "                   One file is also OK, output a single N.\n"
+                "                   One file is also OK, output a single `N`.\n"
+                "                   With -q, the quality value set to `!` (33)\n"
                 "usage:\n"
                 "    faops interleave [options] <R1.fa> [R2.fa]\n"
                 "\n"
                 "options:\n"
+                "    -q         write FQ. The inputs must be FQs\n"
                 "    -p STR     prefix of names [read]\n"
                 "    -s INT     start index [0]\n"
                 "\n"
@@ -1694,15 +1702,31 @@ int fa_interleave(int argc, char *argv[]) {
                 break;
             }
 
-            // R1
-            sprintf(seq_name, "%s%zu", prefix, serial_no);
-            fprintf(stdout, ">%s/1\n", seq_name);
-            fprintf(stdout, "%s\n", seq[0]->seq.s);
+            if (flag_fq) {
+                // R1
+                sprintf(seq_name, "%s%zu", prefix, serial_no);
+                fprintf(stdout, "@%s/1\n", seq_name);
+                fprintf(stdout, "%s\n", seq[0]->seq.s);
+                fprintf(stdout, "+\n");
+                fprintf(stdout, "%s\n", seq[0]->qual.s);
 
-            // R2
-            sprintf(seq_name, "%s%zu", prefix, serial_no);
-            fprintf(stdout, ">%s/2\n", seq_name);
-            fprintf(stdout, "%s\n", seq[1]->seq.s);
+                // R2
+                sprintf(seq_name, "%s%zu", prefix, serial_no);
+                fprintf(stdout, "@%s/2\n", seq_name);
+                fprintf(stdout, "%s\n", seq[1]->seq.s);
+                fprintf(stdout, "+\n");
+                fprintf(stdout, "%s\n", seq[1]->qual.s);
+            } else {
+                // R1
+                sprintf(seq_name, "%s%zu", prefix, serial_no);
+                fprintf(stdout, ">%s/1\n", seq_name);
+                fprintf(stdout, "%s\n", seq[0]->seq.s);
+
+                // R2
+                sprintf(seq_name, "%s%zu", prefix, serial_no);
+                fprintf(stdout, ">%s/2\n", seq_name);
+                fprintf(stdout, "%s\n", seq[1]->seq.s);
+            }
 
             serial_no++;
         }
@@ -1724,15 +1748,31 @@ int fa_interleave(int argc, char *argv[]) {
 
         long serial_no = start_index; // serial
         while (kseq_read(seq) >= 0) {
-            // R1
-            sprintf(seq_name, "%s%zu", prefix, serial_no);
-            fprintf(stdout, ">%s/1\n", seq_name);
-            fprintf(stdout, "%s\n", seq->seq.s);
+            if (flag_fq) {
+                // R1
+                sprintf(seq_name, "%s%zu", prefix, serial_no);
+                fprintf(stdout, "@%s/1\n", seq_name);
+                fprintf(stdout, "%s\n", seq->seq.s);
+                fprintf(stdout, "+\n");
+                fprintf(stdout, "%s\n", seq->qual.s);
 
-            // R2
-            sprintf(seq_name, "%s%zu", prefix, serial_no);
-            fprintf(stdout, ">%s/2\n", seq_name);
-            fprintf(stdout, "N\n");
+                // R2
+                sprintf(seq_name, "%s%zu", prefix, serial_no);
+                fprintf(stdout, "@%s/2\n", seq_name);
+                fprintf(stdout, "N\n");
+                fprintf(stdout, "+\n");
+                fprintf(stdout, "!\n");
+            } else {
+                // R1
+                sprintf(seq_name, "%s%zu", prefix, serial_no);
+                fprintf(stdout, ">%s/1\n", seq_name);
+                fprintf(stdout, "%s\n", seq->seq.s);
+
+                // R2
+                sprintf(seq_name, "%s%zu", prefix, serial_no);
+                fprintf(stdout, ">%s/2\n", seq_name);
+                fprintf(stdout, "N\n");
+            }
 
             serial_no++;
         }
