@@ -109,7 +109,7 @@ Options:
 `faops` can be compiled under Linux, macOS (gcc or clang) and Windows
 (MinGW).
 
-```bash
+```shell
 git clone https://github.com/wang-q/faops
 cd faops
 make
@@ -117,19 +117,19 @@ make
 
 ## Installing with Homebrew or Linuxbrew
 
-```bash
+```shell
 brew install wang-q/tap/faops
 ```
 
 ## Tests
 
-Done with [bats](https://github.com/sstephenson/bats). Useful articles:
+Done with [bats](https://github.com/bats-core/bats-core). Useful articles:
 
 * https://blog.engineyard.com/2014/bats-test-command-line-tools
 * http://blog.spike.cx/post/60548255435/testing-bash-scripts-with-bats
 
-```bash
-#brew install bats
+```shell
+# brew install bats-core
 make test
 ```
 
