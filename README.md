@@ -22,10 +22,10 @@ Comparing to Kent's `fa*` utilities, `faops` is:
 [`ufasta`](http://www.genome.umd.edu/masurca.html).
 
 ```text
-$ ./faops help
+$ ./faops
 
 Usage:     faops <command> [options] <arguments>
-Version:   0.8.20
+Version:   0.8.21
 
 Commands:
     help           print this message

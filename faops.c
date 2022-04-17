@@ -1919,7 +1919,7 @@ int fa_region(int argc, char *argv[]) {
     return 0;
 }
 
-char *version = "0.8.20";
+char *version = "0.8.21";
 char *message =
         "\n"
         "Usage:     faops <command> [options] <arguments>\n"
