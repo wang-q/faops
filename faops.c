@@ -636,7 +636,7 @@ int fa_one(int argc, char *argv[]) {
                 "\n"
                 "faops one - Extract one fa sequence\n"
                 "usage:\n"
-                "    faops some [options] <in.fa> <name> <out.fa>\n"
+                "    faops one [options] <in.fa> <name> <out.fa>\n"
                 "\n"
                 "options:\n"
                 "    -l INT     sequence line length [%d]\n"
