@@ -41,8 +41,7 @@ KHASH_MAP_INIT_STR(str2str, char*)
 #define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
 
 enum {
-    BUFFER_SIZE = 2 ^ 16,
-    BUFFER_SIZE_LONG = 2 ^ 32
+    BUFFER_SIZE = 1 << 16,
 };
 
 enum {
@@ -1850,7 +1849,7 @@ int fa_region(int argc, char *argv[]) {
         while (getline(&lineptr, &len, fp_list) != -1) {
             int ret;            // return value from hashing
             char buf1[512];    // buffers for seq_name in region.txt
-            char buf2[BUFFER_SIZE_LONG];   // buffers for runlist in region.txt
+            char buf2[65536];   // buffers for runlist in region.txt
             if (sscanf(lineptr, "%[^:]:%[0-9,-]\n", buf1, buf2) == 2) {
                 khint_t entry = kh_put(str2str, hash, strdup(buf1), &ret);
                 kh_val(hash, entry) = strdup(buf2);
